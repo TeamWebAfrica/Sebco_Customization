@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include sebco_customization *.css
+recursive-include sebco_customization *.csv
+recursive-include sebco_customization *.html
+recursive-include sebco_customization *.ico
+recursive-include sebco_customization *.js
+recursive-include sebco_customization *.json
+recursive-include sebco_customization *.md
+recursive-include sebco_customization *.png
+recursive-include sebco_customization *.py
+recursive-include sebco_customization *.svg
+recursive-include sebco_customization *.txt
+recursive-exclude sebco_customization *.pyc
