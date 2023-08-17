@@ -185,3 +185,5 @@ app_license = "MIT"
 # auth_hooks = [
 #	"sebco_customization.auth.validate"
 # ]
+
+fixtures = ["Custom Field"]
