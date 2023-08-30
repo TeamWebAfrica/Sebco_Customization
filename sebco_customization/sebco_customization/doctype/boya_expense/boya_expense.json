@@ -1,0 +1,202 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-08-31 00:56:21.603820",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "status",
+  "transaction_ref",
+  "provider_ref",
+  "amount",
+  "fees",
+  "original_currency",
+  "employee_id",
+  "person",
+  "merchant_category_code",
+  "fx_rate",
+  "card_vcn",
+  "reciever",
+  "account_no",
+  "channel",
+  "subcategory",
+  "team",
+  "currency",
+  "tag",
+  "notes",
+  "attachments",
+  "payment_status",
+  "reviews",
+  "exported",
+  "sync_successful",
+  "external_sync_id",
+  "sync_error",
+  "vendor"
+ ],
+ "fields": [
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nPending\nComplete\nCancelled\nSubmitted"
+  },
+  {
+   "fieldname": "transaction_ref",
+   "fieldtype": "Data",
+   "label": "Transaction Ref"
+  },
+  {
+   "fieldname": "provider_ref",
+   "fieldtype": "Data",
+   "label": "Provider Ref"
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Data",
+   "label": "Amount"
+  },
+  {
+   "fieldname": "fees",
+   "fieldtype": "Data",
+   "label": "Fees"
+  },
+  {
+   "fieldname": "original_currency",
+   "fieldtype": "Data",
+   "label": "Original Currency"
+  },
+  {
+   "fieldname": "employee_id",
+   "fieldtype": "Data",
+   "label": "Employee Id"
+  },
+  {
+   "fieldname": "person",
+   "fieldtype": "Data",
+   "label": "Person"
+  },
+  {
+   "fieldname": "merchant_category_code",
+   "fieldtype": "Data",
+   "label": "Merchant Category Code"
+  },
+  {
+   "fieldname": "fx_rate",
+   "fieldtype": "Data",
+   "label": "FX Rate"
+  },
+  {
+   "fieldname": "card_vcn",
+   "fieldtype": "Data",
+   "label": "Card VCN"
+  },
+  {
+   "fieldname": "reciever",
+   "fieldtype": "Data",
+   "label": "Reciever"
+  },
+  {
+   "fieldname": "account_no",
+   "fieldtype": "Data",
+   "label": "Account No"
+  },
+  {
+   "fieldname": "channel",
+   "fieldtype": "Data",
+   "label": "Channel"
+  },
+  {
+   "fieldname": "subcategory",
+   "fieldtype": "Data",
+   "label": "Subcategory"
+  },
+  {
+   "fieldname": "team",
+   "fieldtype": "Data",
+   "label": "Team"
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Data",
+   "label": "Currency"
+  },
+  {
+   "fieldname": "tag",
+   "fieldtype": "Data",
+   "label": "Tag"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Data",
+   "label": "Notes"
+  },
+  {
+   "fieldname": "payment_status",
+   "fieldtype": "Data",
+   "label": "Payment Status "
+  },
+  {
+   "fieldname": "attachments",
+   "fieldtype": "Table",
+   "label": "Attachments",
+   "options": "Boya Expense Attachment"
+  },
+  {
+   "fieldname": "reviews",
+   "fieldtype": "Table",
+   "label": "Reviews",
+   "options": "Boya Expese Review"
+  },
+  {
+   "fieldname": "exported",
+   "fieldtype": "Data",
+   "label": "Exported"
+  },
+  {
+   "fieldname": "sync_successful",
+   "fieldtype": "Data",
+   "label": "Sync Successful"
+  },
+  {
+   "fieldname": "external_sync_id",
+   "fieldtype": "Data",
+   "label": "External Sync Id"
+  },
+  {
+   "fieldname": "sync_error",
+   "fieldtype": "Data",
+   "label": "Sync Error"
+  },
+  {
+   "fieldname": "vendor",
+   "fieldtype": "Data",
+   "label": "Vendor"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-08-31 01:06:01.611842",
+ "modified_by": "Administrator",
+ "module": "Sebco Customization",
+ "name": "Boya Expense",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

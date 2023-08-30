@@ -113,23 +113,28 @@ app_license = "MIT"
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-#	"all": [
-#		"sebco_customization.tasks.all"
-#	],
-#	"daily": [
-#		"sebco_customization.tasks.daily"
-#	],
-#	"hourly": [
-#		"sebco_customization.tasks.hourly"
-#	],
-#	"weekly": [
-#		"sebco_customization.tasks.weekly"
-#	],
-#	"monthly": [
-#		"sebco_customization.tasks.monthly"
-#	],
-# }
+scheduler_events = {
+    "cron": {
+		"0/1 * * * *": [
+			"sebco_customization.sebco_customization.tasks.test_function"
+		],
+    },
+	# "all": [
+	# 	"sebco_customization.tasks.all"
+	# ],
+	# "daily": [
+	# 	"sebco_customization.tasks.daily"
+	# ],
+	# "hourly": [
+	# 	"sebco_customization.tasks.hourly"
+	# ],
+	# "weekly": [
+	# 	"sebco_customization.tasks.weekly"
+	# ],
+	# "monthly": [
+	# 	"sebco_customization.tasks.monthly"
+	# ],
+}
 
 # Testing
 # -------

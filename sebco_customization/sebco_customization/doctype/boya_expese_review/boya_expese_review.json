@@ -1,0 +1,49 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-08-31 01:05:42.106144",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "attachment_url",
+  "reviewed_on",
+  "notes",
+  "status"
+ ],
+ "fields": [
+  {
+   "fieldname": "attachment_url",
+   "fieldtype": "Data",
+   "label": "Person"
+  },
+  {
+   "fieldname": "reviewed_on",
+   "fieldtype": "Date",
+   "label": "Reviewed On"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Text",
+   "label": "Notes"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "label": "Status"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2023-08-31 01:05:42.106144",
+ "modified_by": "Administrator",
+ "module": "Sebco Customization",
+ "name": "Boya Expese Review",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
