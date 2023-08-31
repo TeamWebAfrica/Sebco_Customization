@@ -13,6 +13,7 @@
   "amount",
   "fees",
   "original_currency",
+  "original_amount",
   "employee_id",
   "person",
   "merchant_category_code",
@@ -28,6 +29,7 @@
   "notes",
   "attachments",
   "payment_status",
+  "boya_status",
   "reviews",
   "exported",
   "sync_successful",
@@ -173,11 +175,21 @@
    "fieldname": "vendor",
    "fieldtype": "Data",
    "label": "Vendor"
+  },
+  {
+   "fieldname": "original_amount",
+   "fieldtype": "Data",
+   "label": "Original Amount"
+  },
+  {
+   "fieldname": "boya_status",
+   "fieldtype": "Data",
+   "label": "Boya Status"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-08-31 01:06:01.611842",
+ "modified": "2023-08-31 22:00:23.419158",
  "modified_by": "Administrator",
  "module": "Sebco Customization",
  "name": "Boya Expense",
