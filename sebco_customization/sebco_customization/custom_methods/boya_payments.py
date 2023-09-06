@@ -1,4 +1,5 @@
 import frappe
+from datetime import datetime
 
 class BoyaPayments:
     '''
@@ -6,6 +7,7 @@ class BoyaPayments:
     '''
     def __init__(self, expense_details):
         self.expense_details = expense_details
+        self.abort_transaction = False
 
     def process_expense_notification(self):
         '''
@@ -13,12 +15,16 @@ class BoyaPayments:
         expense notification from Boya
         '''
         self.get_or_create_boya_expense()
+        # self.create_journal_entry()
 
     def get_or_create_boya_expense(self):
         '''
         Method that checks if the given Boya expense already exists 
         in the database and if not creates one
         '''
+        if self.abort_transaction:
+            return 
+
         boya_expense_list = frappe.get_list('Boya Expense', fields=['name'], filters={
             'transaction_ref': self.expense_details['transaction_ref']
         })
@@ -102,10 +108,57 @@ class BoyaPayments:
         Method that creates a jounal entry based on a notifaction recieved from 
         Boya
         '''
+        if self.abort_transaction:
+            return 
+        
+        # get account details
+        sebco_settings = frappe.get_single('Sebco Settings')
+        expense_credit_account = sebco_settings.boya_expense_account
+        expense_acc_no = self.expense_details['accno']
+
+        account_list = frappe.get_list('Account', 
+            fields=['name'], filters={
+            'account_number': expense_acc_no
+        })
+
+        if not len(account_list):
+            # add a error log to boya expense
+            self.expense_doc.append('activity_logs_table',
+                {
+                    'activity': 'Getting Expense Account',
+                    'status': 'Failed',
+                    'description': 'The account number: {} does not exist.'.format(expense_acc_no)
+                }
+            )
+            self.expense_doc.save()
+            frappe.db.commit()
+
+            # Abort transaction
+            self.abort_transaction = True
+            return
+        
+        erp_expense_acc_name = account_list[0]['name']
+        
         # Create a new journal entry
         new_journal_entry = frappe.new_doc('Journal Entry')
+        new_journal_entry.voucher_type = 'Bank Entry'
+        new_journal_entry.posting_date = datetime.today().date()
         
-        #Add all the required details for the journal entry
+        # credit account
+        new_journal_entry.append('accounts', {
+            'account': erp_expense_acc_name,
+            'credit_in_account_currency': self.expense_details['amount'],
+            'debit_in_account_currency': 0
+        })
+        # debit account
+        new_journal_entry.append('accounts', {
+            'account': expense_credit_account,
+            'debit_in_account_currency': self.expense_details['amount'],
+            'credit_in_account_currency': 0
+        })
+        
+        # Add all the required details for the journal entry
+        new_journal_entry.save()
 
     def notification_received(self):
         '''
