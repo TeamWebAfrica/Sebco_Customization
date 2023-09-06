@@ -1,5 +1,2 @@
 def test_function():
-    print('The the functionality ................................... for scheduler')
-
-
-
+    print('The the functionality ...................................for scheduler')
