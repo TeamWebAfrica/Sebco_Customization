@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "BOE-.##########",
  "creation": "2023-08-31 00:56:21.603820",
  "default_view": "List",
  "doctype": "DocType",
@@ -8,10 +9,12 @@
  "engine": "InnoDB",
  "field_order": [
   "status",
+  "id",
   "transaction_ref",
   "provider_ref",
   "amount",
   "fees",
+  "charge",
   "original_currency",
   "original_amount",
   "employee_id",
@@ -21,6 +24,7 @@
   "card_vcn",
   "reciever",
   "account_no",
+  "payment_type",
   "channel",
   "subcategory",
   "team",
@@ -35,7 +39,9 @@
   "sync_successful",
   "external_sync_id",
   "sync_error",
-  "vendor"
+  "vendor",
+  "activity_logs_section",
+  "activity_logs_table"
  ],
  "fields": [
   {
@@ -47,6 +53,7 @@
   {
    "fieldname": "transaction_ref",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Transaction Ref"
   },
   {
@@ -57,6 +64,7 @@
   {
    "fieldname": "amount",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Amount"
   },
   {
@@ -107,6 +115,7 @@
   {
    "fieldname": "channel",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Channel"
   },
   {
@@ -174,6 +183,7 @@
   {
    "fieldname": "vendor",
    "fieldtype": "Data",
+   "in_standard_filter": 1,
    "label": "Vendor"
   },
   {
@@ -185,14 +195,41 @@
    "fieldname": "boya_status",
    "fieldtype": "Data",
    "label": "Boya Status"
+  },
+  {
+   "fieldname": "activity_logs_section",
+   "fieldtype": "Section Break",
+   "label": "Activity Logs"
+  },
+  {
+   "fieldname": "activity_logs_table",
+   "fieldtype": "Table",
+   "label": "Activity Logs Table",
+   "options": "Boya Expense Log"
+  },
+  {
+   "fieldname": "id",
+   "fieldtype": "Data",
+   "label": "ID"
+  },
+  {
+   "fieldname": "charge",
+   "fieldtype": "Data",
+   "label": "Charge"
+  },
+  {
+   "fieldname": "payment_type",
+   "fieldtype": "Data",
+   "label": "Payment Type"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-08-31 22:00:23.419158",
+ "modified": "2023-09-06 23:07:46.351236",
  "modified_by": "Administrator",
  "module": "Sebco Customization",
  "name": "Boya Expense",
+ "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {

@@ -35,12 +35,14 @@ class BoyaPayments:
         # create a new expense
         new_expense_doc = frappe.new_doc('Boya Expense')
         # add all the details from Boya
+        new_expense_doc.id = self.expense_details['_id']
         new_expense_doc.transaction_ref = self.expense_details['transaction_ref']
         new_expense_doc.provider_ref = self.expense_details['provider_ref']
         new_expense_doc.amount = self.expense_details['amount']
         new_expense_doc.fees = self.expense_details['fees']
+        new_expense_doc.charge = self.expense_details['charge']
         new_expense_doc.original_currency = self.expense_details['original_currency']
-        new_expense_doc.original_amount = self.expense_details['original_amount']
+        # new_expense_doc.original_amount = self.expense_details['original_amount']
         new_expense_doc.employee_id = self.expense_details['employee_id']
         new_expense_doc.person = self.expense_details['person']
         new_expense_doc.merchant_category_code = self.expense_details['MerchantCategoryCode']
@@ -48,15 +50,22 @@ class BoyaPayments:
         new_expense_doc.card_vcn = self.expense_details['card_vcn']
         new_expense_doc.reciever = self.expense_details['receiver']
         new_expense_doc.account_no = self.expense_details['accno']
+        new_expense_doc.payment_type = self.expense_details['payment_type']
         new_expense_doc.channel = self.expense_details['channel']
         new_expense_doc.subcategory = self.expense_details['subcategory']
-        new_expense_doc.team = self.expense_details['team']
+
+        # handle team as a table
+        # new_expense_doc.team = self.expense_details['team']
+
         new_expense_doc.currency = self.expense_details['currency']
-        new_expense_doc.tag = self.expense_details['tag']
+
+        # handle tag as a list/ table
+        # new_expense_doc.tag = self.expense_details['tag']
+
         new_expense_doc.notes = self.expense_details['notes']
 
         # Add attachements here
-        if len(self.expense_details['attachments']):
+        if self.expense_details['attachments'] and len(self.expense_details['attachments']):
             for attachement in self.expense_details['attachments']:
                 new_expense_doc.append("attachments", {
 					"attachment_url":attachement,
@@ -66,7 +75,7 @@ class BoyaPayments:
         new_expense_doc.boya_status = self.expense_details['status']
 
         # Add reviews here
-        if len(self.expense_details['reviews']):
+        if self.expense_details['reviews'] and len(self.expense_details['reviews']):
             for review in self.expense_details['reviews']:
                 new_expense_doc.append("reviews", {
 					"person": review['person'],
@@ -77,8 +86,8 @@ class BoyaPayments:
 
         new_expense_doc.exported = self.expense_details['exported']
         new_expense_doc.sync_successful = self.expense_details['sync_successful']
-        new_expense_doc.external_sync_id = self.expense_details['external_sync_id']
-        new_expense_doc.sync_error = self.expense_details['sync_error']
+        # new_expense_doc.external_sync_id = self.expense_details['external_sync_id']
+        # new_expense_doc.sync_error = self.expense_details['sync_error']
         new_expense_doc.vendor = self.expense_details['vendor']
         
         # save new expense
