@@ -64,12 +64,14 @@ class BoyaPayments:
         new_expense_doc.subcategory_id = self.expense_details['subcategory']['_id']
         new_expense_doc.group_id = self.expense_details['subcategory']['group_id']
         new_expense_doc.category = self.expense_details['subcategory']['category']
+        new_expense_doc.sub_category_status = self.expense_details['subcategory']['status']
         new_expense_doc.code = self.expense_details['subcategory']['code']
         new_expense_doc.name1 = self.expense_details['subcategory']['name']
         new_expense_doc.description = self.expense_details['subcategory']['description']
         new_expense_doc.mapping_id = self.expense_details['subcategory']['mapping_id']
         new_expense_doc.created_at_subcategory = self.expense_details['subcategory']['createdAt']
         new_expense_doc.__v = self.expense_details['subcategory']['__v']
+        new_expense_doc.updated_at_subcategory = self.expense_details['subcategory']['updatedAt']
 
 
         # handle team as a table
