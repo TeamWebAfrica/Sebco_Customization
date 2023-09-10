@@ -58,7 +58,19 @@ class BoyaPayments:
         new_expense_doc.account_no = self.expense_details['accno']
         new_expense_doc.payment_type = self.expense_details['payment_type']
         new_expense_doc.channel = self.expense_details['channel']
-        new_expense_doc.subcategory = self.expense_details['subcategory']
+
+        # handle sub category as  table
+        # new_expense_doc.subcategory = self.expense_details['subcategory']
+        new_expense_doc.subcategory_id = self.expense_details['subcategory']['_id']
+        new_expense_doc.group_id = self.expense_details['subcategory']['group_id']
+        new_expense_doc.category = self.expense_details['subcategory']['category']
+        new_expense_doc.code = self.expense_details['subcategory']['code']
+        new_expense_doc.name1 = self.expense_details['subcategory']['name']
+        new_expense_doc.description = self.expense_details['subcategory']['description']
+        new_expense_doc.mapping_id = self.expense_details['subcategory']['mapping_id']
+        new_expense_doc.created_at_subcategory = self.expense_details['subcategory']['createdAt']
+        new_expense_doc.__v = self.expense_details['subcategory']['__v']
+
 
         # handle team as a table
         # new_expense_doc.team = self.expense_details['team']
@@ -95,6 +107,9 @@ class BoyaPayments:
         # new_expense_doc.external_sync_id = self.expense_details['external_sync_id']
         # new_expense_doc.sync_error = self.expense_details['sync_error']
         new_expense_doc.vendor = self.expense_details['vendor']
+
+        # Add complete request data log here
+        new_expense_doc.complete_request_data = str(self.expense_details)
         
         # save new expense
         new_expense_doc.save()
