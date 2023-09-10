@@ -8,29 +8,50 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "general_details_section_section",
   "status",
   "id",
+  "column_break_3mf2i",
   "transaction_ref",
   "provider_ref",
+  "amount_and_fees_section_section",
   "amount",
   "fees",
+  "column_break_tyb2v",
   "charge",
   "original_currency",
   "original_amount",
+  "more_details_section_section",
   "employee_id",
   "person",
   "merchant_category_code",
   "fx_rate",
+  "column_break_wopbn",
   "card_vcn",
   "reciever",
   "account_no",
   "payment_type",
   "channel",
-  "subcategory",
+  "subcategory_section_section",
+  "subcategory_id",
+  "group_id",
+  "category",
+  "code",
+  "name1",
+  "column_break_fcqp1",
+  "description",
+  "sub_category_status",
+  "mapping_id",
+  "created_at_subcategory",
+  "__v",
+  "updated_at_subcategory",
+  "team_section",
   "team",
   "currency",
+  "column_break_ayykx",
   "tag",
   "notes",
+  "attachments_section_section",
   "attachments",
   "payment_status",
   "boya_status",
@@ -41,14 +62,17 @@
   "sync_error",
   "vendor",
   "activity_logs_section",
-  "activity_logs_table"
+  "activity_logs_table",
+  "complete_details_section_section",
+  "complete_request_data"
  ],
  "fields": [
   {
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Draft\nPending\nComplete\nCancelled\nSubmitted"
+   "options": "Draft\nPending\nComplete\nCancelled\nSubmitted",
+   "read_only": 1
   },
   {
    "fieldname": "transaction_ref",
@@ -117,11 +141,6 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Channel"
-  },
-  {
-   "fieldname": "subcategory",
-   "fieldtype": "Data",
-   "label": "Subcategory"
   },
   {
    "fieldname": "team",
@@ -221,11 +240,126 @@
    "fieldname": "payment_type",
    "fieldtype": "Data",
    "label": "Payment Type"
+  },
+  {
+   "fieldname": "subcategory_section_section",
+   "fieldtype": "Section Break",
+   "label": "Subcategory Section"
+  },
+  {
+   "fieldname": "subcategory_id",
+   "fieldtype": "Data",
+   "label": "Subcategory ID"
+  },
+  {
+   "fieldname": "group_id",
+   "fieldtype": "Data",
+   "label": "Group ID"
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Data",
+   "label": "Category"
+  },
+  {
+   "fieldname": "code",
+   "fieldtype": "Data",
+   "label": "Code"
+  },
+  {
+   "fieldname": "name1",
+   "fieldtype": "Data",
+   "label": "Name"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  },
+  {
+   "fieldname": "sub_category_status",
+   "fieldtype": "Data",
+   "label": "Sub Category Status"
+  },
+  {
+   "fieldname": "mapping_id",
+   "fieldtype": "Data",
+   "label": "Mapping Id"
+  },
+  {
+   "fieldname": "created_at_subcategory",
+   "fieldtype": "Data",
+   "label": "Created At Subcategory"
+  },
+  {
+   "fieldname": "__v",
+   "fieldtype": "Data",
+   "label": "__v"
+  },
+  {
+   "fieldname": "updated_at_subcategory",
+   "fieldtype": "Data",
+   "label": "Updated At Subcategory"
+  },
+  {
+   "fieldname": "team_section",
+   "fieldtype": "Section Break",
+   "label": "Team"
+  },
+  {
+   "fieldname": "complete_details_section_section",
+   "fieldtype": "Section Break",
+   "label": "Complete Details Section"
+  },
+  {
+   "fieldname": "complete_request_data",
+   "fieldtype": "Text",
+   "label": "Complete Request Data"
+  },
+  {
+   "fieldname": "general_details_section_section",
+   "fieldtype": "Section Break",
+   "label": "General Details Section"
+  },
+  {
+   "fieldname": "amount_and_fees_section_section",
+   "fieldtype": "Section Break",
+   "label": "Amount and Fees Section"
+  },
+  {
+   "fieldname": "more_details_section_section",
+   "fieldtype": "Section Break",
+   "label": "More Details Section"
+  },
+  {
+   "fieldname": "column_break_3mf2i",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_tyb2v",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_wopbn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_fcqp1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_ayykx",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "attachments_section_section",
+   "fieldtype": "Section Break",
+   "label": "Attachments Section"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-09-06 23:07:46.351236",
+ "modified": "2023-09-10 13:33:51.332255",
  "modified_by": "Administrator",
  "module": "Sebco Customization",
  "name": "Boya Expense",
