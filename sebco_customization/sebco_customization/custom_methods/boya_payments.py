@@ -15,7 +15,7 @@ class BoyaPayments:
         expense notification from Boya
         '''
         self.get_or_create_boya_expense()
-        # self.create_journal_entry()
+        self.create_journal_entry()
 
     def get_or_create_boya_expense(self):
         '''
@@ -125,17 +125,69 @@ class BoyaPayments:
         Method that creates a jounal entry based on a notifaction recieved from 
         Boya
         '''
+        if self.expense_doc.status == 'Complete':
+            self.expense_doc.append('activity_logs_table',
+            {
+                'activity': 'Posting Journal Entry',
+                'status': 'Failed',
+                'description': 'This transaction has already been comleted (Double Posting from Boya)'
+            }
+            )
+            self.expense_doc.save()
+            frappe.db.commit()
+            return
+        
+        # Mark transaction expense as pending
+        self.expense_doc.status = 'Pending'
+        # add a error log to boya expense
+        self.expense_doc.append('activity_logs_table',
+            {
+                'activity': 'Posting Journal Entry',
+                'status': 'Success',
+                'description': 'Linking to Journal entry process started'
+            }
+        )
+        self.expense_doc.save()
+        frappe.db.commit()
+
         if self.abort_transaction:
+            self.expense_doc.append('activity_logs_table',
+            {
+                'activity': 'Posting Journal Entry',
+                'status': 'Failed',
+                'description': 'Transaction aborted'
+            }
+            )
+            self.expense_doc.save()
+            frappe.db.commit()
             return 
         
+        # check for duplicate transaction
+        if self.expense_doc.linked_journal_entry:
+            
+            # add a error log to boya expense
+            self.expense_doc.append('activity_logs_table',
+                {
+                    'activity': 'Checking Journal Entry',
+                    'status': 'Failed',
+                    'description': 'This expense transaction is already linked to a Journal Entry: {}.'.format(self.expense_doc.linked_journal_entry)
+                }
+            )
+            self.expense_doc.save()
+            frappe.db.commit()
+
+            # Abort transaction
+            self.abort_transaction = True
+            return
+
         # get account details
         sebco_settings = frappe.get_single('Sebco Settings')
-        expense_credit_account = sebco_settings.boya_expense_account
-        expense_acc_no = self.expense_details['accno']
+        boya_expense_acc_name = sebco_settings.boya_expense_account
+        supplier_expense_acc_no = self.expense_details['subcategory']['code']
 
         account_list = frappe.get_list('Account', 
             fields=['name'], filters={
-            'account_number': expense_acc_no
+            'account_number': supplier_expense_acc_no
         })
 
         if not len(account_list):
@@ -144,7 +196,7 @@ class BoyaPayments:
                 {
                     'activity': 'Getting Expense Account',
                     'status': 'Failed',
-                    'description': 'The account number: {} does not exist.'.format(expense_acc_no)
+                    'description': 'The account number: {} does not exist.'.format(supplier_expense_acc_no)
                 }
             )
             self.expense_doc.save()
@@ -154,28 +206,53 @@ class BoyaPayments:
             self.abort_transaction = True
             return
         
-        erp_expense_acc_name = account_list[0]['name']
-        
+        supplier_expense_acc_name = account_list[0]['name']
+        transaction_date = self.expense_details['transaction_date'].split('T')[0]
         # Create a new journal entry
         new_journal_entry = frappe.new_doc('Journal Entry')
         new_journal_entry.voucher_type = 'Bank Entry'
-        new_journal_entry.posting_date = datetime.today().date()
+        new_journal_entry.posting_date = transaction_date
+        new_journal_entry.cheque_no = self.expense_details['transaction_ref'],
+        new_journal_entry.cheque_date = transaction_date
         
         # credit account
         new_journal_entry.append('accounts', {
-            'account': erp_expense_acc_name,
-            'credit_in_account_currency': self.expense_details['amount'],
-            'debit_in_account_currency': 0
+            'account': boya_expense_acc_name,
+            'debit_in_account_currency': 0,
+            'credit_in_account_currency': self.expense_details['amount']
         })
         # debit account
         new_journal_entry.append('accounts', {
-            'account': expense_credit_account,
+            'account': supplier_expense_acc_name,
             'debit_in_account_currency': self.expense_details['amount'],
             'credit_in_account_currency': 0
         })
+
+        # add description
+        new_journal_entry.user_remark = 'From Boya Payments API: Linked to Boya Expense {}'.format(self.expense_doc.name)
         
         # Add all the required details for the journal entry
         new_journal_entry.save()
+
+        # submit the journal entry
+        new_journal_entry.submit()
+
+        # add success log to boya expense
+        self.expense_doc.append('activity_logs_table',
+            {
+                'activity': 'Posting Expense to Journal Entry',
+                'status': 'Success',
+                'description': f'Successfully posted to Journal Entry: {new_journal_entry.name}'
+            }
+        )
+        self.expense_doc.save()
+        frappe.db.commit()
+
+        # update the status of expense
+        self.expense_doc.status = 'Complete'
+        self.expense_doc.linked_journal_entry = new_journal_entry.name
+        self.expense_doc.save()
+        frappe.db.commit()
 
     def notification_received(self):
         '''
