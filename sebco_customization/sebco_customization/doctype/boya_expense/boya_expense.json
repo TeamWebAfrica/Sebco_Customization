@@ -14,6 +14,7 @@
   "column_break_3mf2i",
   "transaction_ref",
   "provider_ref",
+  "linked_journal_entry",
   "amount_and_fees_section_section",
   "amount",
   "fees",
@@ -355,11 +356,18 @@
    "fieldname": "attachments_section_section",
    "fieldtype": "Section Break",
    "label": "Attachments Section"
+  },
+  {
+   "fieldname": "linked_journal_entry",
+   "fieldtype": "Link",
+   "label": "Linked Journal Entry",
+   "options": "Journal Entry",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-09-10 13:33:51.332255",
+ "modified": "2023-09-12 20:26:40.577467",
  "modified_by": "Administrator",
  "module": "Sebco Customization",
  "name": "Boya Expense",
