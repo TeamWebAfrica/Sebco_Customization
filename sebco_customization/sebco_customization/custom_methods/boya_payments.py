@@ -130,7 +130,7 @@ class BoyaPayments:
             {
                 'activity': 'Posting Journal Entry',
                 'status': 'Failed',
-                'description': 'This transaction has already been comleted (Double Posting from Boya)'
+                'description': 'This transaction has already been completed (Double Posting from Boya)'
             }
             )
             self.expense_doc.save()
@@ -139,7 +139,7 @@ class BoyaPayments:
         
         # Mark transaction expense as pending
         self.expense_doc.status = 'Pending'
-        # add a error log to boya expense
+        # add an initialization log to boya expense
         self.expense_doc.append('activity_logs_table',
             {
                 'activity': 'Posting Journal Entry',
@@ -152,12 +152,13 @@ class BoyaPayments:
 
         if self.abort_transaction:
             self.expense_doc.append('activity_logs_table',
-            {
-                'activity': 'Posting Journal Entry',
-                'status': 'Failed',
-                'description': 'Transaction aborted'
-            }
+                {
+                    'activity': 'Posting Journal Entry',
+                    'status': 'Failed',
+                    'description': 'Transaction aborted'
+                }
             )
+            self.expense_doc.status = 'Failed'
             self.expense_doc.save()
             frappe.db.commit()
             return 
@@ -173,6 +174,7 @@ class BoyaPayments:
                     'description': 'This expense transaction is already linked to a Journal Entry: {}.'.format(self.expense_doc.linked_journal_entry)
                 }
             )
+            self.expense_doc.status = 'Failed'
             self.expense_doc.save()
             frappe.db.commit()
 
@@ -184,6 +186,28 @@ class BoyaPayments:
         sebco_settings = frappe.get_single('Sebco Settings')
         boya_expense_acc_name = sebco_settings.boya_expense_account
         supplier_expense_acc_no = self.expense_details['subcategory']['code']
+
+
+        # Sebco accounts from are given in the following format
+        # <Project Identifiers - varying number of letters><seven digits - actual account number>
+        supplier_expense_acc_no = supplier_expense_acc_no[-7:]
+        if len(supplier_expense_acc_no) != 7:
+            # add a error log to boya expense
+            self.expense_doc.append('activity_logs_table',
+                {
+                    'activity': 'Checking Account Validity',
+                    'status': 'Failed',
+                    'description': 'Every account should be made of 7 digits apart from project identifiers'.format(supplier_expense_acc_no)
+                }
+            )
+            self.expense_doc.status = 'Failed'
+            self.expense_doc.save()
+            frappe.db.commit()
+
+            # Abort transaction
+            self.abort_transaction = True
+            return
+        supplier_expense_acc_no = supplier_expense_acc_no[:4] + '/' + supplier_expense_acc_no[4:]
 
         account_list = frappe.get_list('Account', 
             fields=['name'], filters={
@@ -199,6 +223,7 @@ class BoyaPayments:
                     'description': 'The account number: {} does not exist.'.format(supplier_expense_acc_no)
                 }
             )
+            self.expense_doc.status = 'Failed'
             self.expense_doc.save()
             frappe.db.commit()
 
