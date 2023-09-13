@@ -71,8 +71,9 @@
   {
    "fieldname": "status",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Status",
-   "options": "Draft\nPending\nComplete\nCancelled\nSubmitted",
+   "options": "Draft\nPending\nComplete\nCancelled\nFailed",
    "read_only": 1
   },
   {
@@ -367,7 +368,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-09-12 20:26:40.577467",
+ "modified": "2023-09-13 20:41:32.841122",
  "modified_by": "Administrator",
  "module": "Sebco Customization",
  "name": "Boya Expense",
