@@ -8,7 +8,8 @@
  "engine": "InnoDB",
  "field_order": [
   "boya_details_section",
-  "boya_expense_account"
+  "boya_expense_account",
+  "bank_charges"
  ],
  "fields": [
   {
@@ -21,12 +22,18 @@
    "fieldtype": "Link",
    "label": "Boya Expense Account",
    "options": "Account"
+  },
+  {
+   "fieldname": "bank_charges",
+   "fieldtype": "Link",
+   "label": "Bank Charges (Sebco Fees)",
+   "options": "Account"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-09-03 13:54:47.436888",
+ "modified": "2023-09-18 21:11:04.442941",
  "modified_by": "Administrator",
  "module": "Sebco Customization",
  "name": "Sebco Settings",

@@ -185,8 +185,24 @@ class BoyaPayments:
         # get account details
         sebco_settings = frappe.get_single('Sebco Settings')
         boya_expense_acc_name = sebco_settings.boya_expense_account
+        boya_fees_acc_name = sebco_settings.bank_charges
         supplier_expense_acc_no = self.expense_details['subcategory']['code']
+        if not boya_expense_acc_name or not boya_fees_acc_name:
+            # add a error log to boya expense
+            self.expense_doc.append('activity_logs_table',
+                {
+                    'activity': 'Fetching Expense/Bank Charges',
+                    'status': 'Failed',
+                    'description': 'Error occuring fetching expense account in Sebco Settings'
+                }
+            )
+            self.expense_doc.status = 'Failed'
+            self.expense_doc.save()
+            frappe.db.commit()
 
+            # Abort transaction
+            self.abort_transaction = True
+            return
 
         # Sebco accounts from are given in the following format
         # <Project Identifiers - varying number of letters><seven digits - actual account number>
@@ -207,6 +223,7 @@ class BoyaPayments:
             # Abort transaction
             self.abort_transaction = True
             return
+        
         supplier_expense_acc_no = supplier_expense_acc_no[:4] + '/' + supplier_expense_acc_no[4:]
 
         account_list = frappe.get_list('Account', 
@@ -244,14 +261,21 @@ class BoyaPayments:
         new_journal_entry.append('accounts', {
             'account': boya_expense_acc_name,
             'debit_in_account_currency': 0,
-            'credit_in_account_currency': self.expense_details['amount']
+            'credit_in_account_currency': self.expense_details['charge']
         })
-        # debit account
+        # debit account (Amount)
         new_journal_entry.append('accounts', {
             'account': supplier_expense_acc_name,
             'debit_in_account_currency': self.expense_details['amount'],
             'credit_in_account_currency': 0
         })
+        # debit account (Charge/Fees)
+        new_journal_entry.append('accounts', {
+            'account': boya_fees_acc_name,
+            'debit_in_account_currency': self.expense_details['fees'],
+            'credit_in_account_currency': 0
+        })
+
 
         # add description
         new_journal_entry.user_remark = 'From Boya Payments API: Linked to Boya Expense {}'.format(self.expense_doc.name)
