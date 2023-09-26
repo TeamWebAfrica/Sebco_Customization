@@ -254,8 +254,9 @@ class BoyaPayments:
         new_journal_entry = frappe.new_doc('Journal Entry')
         new_journal_entry.voucher_type = 'Bank Entry'
         new_journal_entry.posting_date = transaction_date
-        new_journal_entry.cheque_no = self.expense_details['transaction_ref'],
+        new_journal_entry.cheque_no = self.expense_details['provider_ref'],
         new_journal_entry.cheque_date = transaction_date
+        new_journal_entry.bill_no = self.expense_details['transaction_ref']
         
         # credit account
         new_journal_entry.append('accounts', {
@@ -278,7 +279,7 @@ class BoyaPayments:
 
 
         # add description
-        new_journal_entry.user_remark = 'From Boya Payments API: Linked to Boya Expense {}'.format(self.expense_doc.name)
+        new_journal_entry.user_remark = self.expense_details['notes']
         
         # Add all the required details for the journal entry
         new_journal_entry.save()
