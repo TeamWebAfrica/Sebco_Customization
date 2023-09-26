@@ -279,7 +279,7 @@ class BoyaPayments:
 
 
         # add description
-        new_journal_entry.user_remark = 'From Boya Payments API: Linked to Boya Expense {}'.format(self.expense_doc.name)
+        new_journal_entry.user_remark = self.expense_details['notes']
         
         # Add all the required details for the journal entry
         new_journal_entry.save()
