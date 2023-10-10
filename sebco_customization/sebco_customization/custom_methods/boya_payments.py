@@ -112,6 +112,9 @@ class BoyaPayments:
 
         # Add complete request data log here
         new_expense_doc.complete_request_data = str(self.expense_details)
+
+        # add project abbreviations
+        new_expense_doc.project_abbreviation = self.expense_details['subcategory']['code'][:-7]
         
         # save new expense
         new_expense_doc.save()
@@ -181,11 +184,35 @@ class BoyaPayments:
             # Abort transaction
             self.abort_transaction = True
             return
+        
+        # get project associated with expense
+        project_list = frappe.get_list('Project', fields=['name','company','cost_center'], filters={
+            'project_abbreviation': self.expense_doc.project_abbreviation
+        })
+
+        associated_company, associated_cost_center = None, None # company and cost center of project owner
+        if len(project_list):
+            # get company associated with project
+            associated_company = project_list[0]['company']
+            associated_cost_center = project_list[0]['cost_center']    
 
         # get account details
         sebco_settings = frappe.get_single('Sebco Settings')
-        boya_expense_acc_name = sebco_settings.boya_expense_account
-        boya_fees_acc_name = sebco_settings.bank_charges
+        company_expense_accounts = sebco_settings.boya_expense_company_account
+        boya_expense_acc_name, boya_fees_acc_name = None, None
+        if associated_company:
+            filtered_list = list(filter(lambda x: x.company == associated_company, company_expense_accounts))
+            if len(filtered_list):
+                boya_expense_acc_name = filtered_list[0].expense_account
+                boya_fees_acc_name = filtered_list[0].bank_charges_account
+        else:
+            associated_company = sebco_settings.main_company
+
+        if not boya_expense_acc_name:
+            boya_expense_acc_name = sebco_settings.boya_expense_account
+        if not boya_fees_acc_name:
+            boya_fees_acc_name = sebco_settings.bank_charges
+
         supplier_expense_acc_no = self.expense_details['subcategory']['code']
         if not boya_expense_acc_name or not boya_fees_acc_name:
             # add a error log to boya expense
@@ -228,7 +255,8 @@ class BoyaPayments:
 
         account_list = frappe.get_list('Account', 
             fields=['name'], filters={
-            'account_number': supplier_expense_acc_no
+            'account_number': supplier_expense_acc_no,
+            'company': associated_company,
         })
 
         if not len(account_list):
@@ -246,8 +274,8 @@ class BoyaPayments:
 
             # Abort transaction
             self.abort_transaction = True
-            return
-        
+            return    
+
         supplier_expense_acc_name = account_list[0]['name']
         transaction_date = self.expense_details['transaction_date'].split('T')[0]
         # Create a new journal entry
@@ -257,26 +285,49 @@ class BoyaPayments:
         new_journal_entry.cheque_no = self.expense_details['provider_ref'],
         new_journal_entry.cheque_date = transaction_date
         new_journal_entry.bill_no = self.expense_details['transaction_ref']
-        
-        # credit account
-        new_journal_entry.append('accounts', {
-            'account': boya_expense_acc_name,
-            'debit_in_account_currency': 0,
-            'credit_in_account_currency': self.expense_details['charge']
-        })
-        # debit account (Amount)
-        new_journal_entry.append('accounts', {
-            'account': supplier_expense_acc_name,
-            'debit_in_account_currency': self.expense_details['amount'],
-            'credit_in_account_currency': 0
-        })
-        # debit account (Charge/Fees)
-        new_journal_entry.append('accounts', {
-            'account': boya_fees_acc_name,
-            'debit_in_account_currency': self.expense_details['fees'],
-            'credit_in_account_currency': 0
-        })
+        if associated_company and associated_cost_center:
+            new_journal_entry.company = associated_company
 
+            # credit account
+            new_journal_entry.append('accounts', {
+                'account': boya_expense_acc_name,
+                'debit_in_account_currency': 0,
+                'credit_in_account_currency': self.expense_details['charge'],
+                'cost_center': associated_cost_center
+            })
+            # debit account (Amount)
+            new_journal_entry.append('accounts', {
+                'account': supplier_expense_acc_name,
+                'debit_in_account_currency': self.expense_details['amount'],
+                'credit_in_account_currency': 0,
+                'cost_center': associated_cost_center
+            })
+            # debit account (Charge/Fees)
+            new_journal_entry.append('accounts', {
+                'account': boya_fees_acc_name,
+                'debit_in_account_currency': self.expense_details['fees'],
+                'credit_in_account_currency': 0,
+                'cost_center': associated_cost_center
+            })
+        else:
+            # credit account
+            new_journal_entry.append('accounts', {
+                'account': boya_expense_acc_name,
+                'debit_in_account_currency': 0,
+                'credit_in_account_currency': self.expense_details['charge']
+            })
+            # debit account (Amount)
+            new_journal_entry.append('accounts', {
+                'account': supplier_expense_acc_name,
+                'debit_in_account_currency': self.expense_details['amount'],
+                'credit_in_account_currency': 0
+            })
+            # debit account (Charge/Fees)
+            new_journal_entry.append('accounts', {
+                'account': boya_fees_acc_name,
+                'debit_in_account_currency': self.expense_details['fees'],
+                'credit_in_account_currency': 0
+            })
 
         # add description
         new_journal_entry.user_remark = self.expense_details['notes']
