@@ -9,9 +9,9 @@
  "field_order": [
   "boya_details_section",
   "main_company",
-  "boya_expense_company_account",
   "boya_expense_account",
-  "bank_charges"
+  "bank_charges",
+  "boya_expense_company_account"
  ],
  "fields": [
   {
@@ -22,13 +22,13 @@
   {
    "fieldname": "boya_expense_account",
    "fieldtype": "Link",
-   "label": "Main Company Expense Account",
+   "label": "Main Company Account",
    "options": "Account"
   },
   {
    "fieldname": "boya_expense_company_account",
    "fieldtype": "Table",
-   "label": "Boya Expense Account Per Company",
+   "label": "Boya Account Per Company",
    "options": "Boya Expense Company Account"
   },
   {
@@ -47,7 +47,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-09-29 00:16:48.353972",
+ "modified": "2023-10-21 14:00:00.919139",
  "modified_by": "Administrator",
  "module": "Sebco Customization",
  "name": "Sebco Settings",
