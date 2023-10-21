@@ -1,13 +1,3 @@
-frappe.ui.form.on("Budget", {
-    refresh: function(frm) {
-        // frm.trigger("my_custom_code");
-    },
-    my_custom_code: function(frm){
-        // console.log("The os ......................................................................")
-    },
-});
-
-
 frappe.ui.form.on('Budget Account', {
     budget_amount: function(frm, cdt, cdn) {
         // When total budget in accounts is updated, recalculate total budget amount
