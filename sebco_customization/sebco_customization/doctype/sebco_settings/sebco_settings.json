@@ -8,9 +8,11 @@
  "engine": "InnoDB",
  "field_order": [
   "boya_details_section",
-  "main_company",
+  "default_company",
   "boya_expense_account",
-  "bank_charges",
+  "column_break_hqgfx",
+  "default_cost_center",
+  "section_break_o7tk7",
   "boya_expense_company_account"
  ],
  "fields": [
@@ -22,7 +24,7 @@
   {
    "fieldname": "boya_expense_account",
    "fieldtype": "Link",
-   "label": "Main Company Account",
+   "label": "Default Boya Acc",
    "options": "Account"
   },
   {
@@ -32,22 +34,30 @@
    "options": "Boya Expense Company Account"
   },
   {
-   "fieldname": "main_company",
+   "fieldname": "section_break_o7tk7",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_hqgfx",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "default_company",
    "fieldtype": "Link",
-   "label": "Main Company",
+   "label": "Default Company",
    "options": "Company"
   },
   {
-   "fieldname": "bank_charges",
+   "fieldname": "default_cost_center",
    "fieldtype": "Link",
-   "label": "Main Company Bank Charges",
-   "options": "Account"
+   "label": "Default Cost Center",
+   "options": "Cost Center"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-10-21 14:00:00.919139",
+ "modified": "2023-10-21 19:20:33.046852",
  "modified_by": "Administrator",
  "module": "Sebco Customization",
  "name": "Sebco Settings",

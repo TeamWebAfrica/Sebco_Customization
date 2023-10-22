@@ -8,7 +8,7 @@
  "field_order": [
   "company",
   "expense_account",
-  "bank_charges_account"
+  "related_party_account__within_company"
  ],
  "fields": [
   {
@@ -23,15 +23,15 @@
    "fieldname": "expense_account",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "Expense Account",
+   "label": "Related Party Account(Default Company)",
    "options": "Account",
    "reqd": 1
   },
   {
-   "fieldname": "bank_charges_account",
+   "fieldname": "related_party_account__within_company",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "Bank Charges Accountt",
+   "label": "Related Party Account(Within Company)",
    "options": "Account",
    "reqd": 1
   }
@@ -39,7 +39,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-09-30 15:13:51.286276",
+ "modified": "2023-10-22 21:10:26.265643",
  "modified_by": "Administrator",
  "module": "Sebco Customization",
  "name": "Boya Expense Company Account",

@@ -10,7 +10,7 @@ frappe.ui.form.on('Sebco Settings', {
 			return {
 				filters: {
 					is_group: 0,
-					company: row.company
+					// company: row.company
 				}
 			};
 		});
@@ -21,7 +21,7 @@ frappe.ui.form.on('Sebco Settings', {
 			return {
 				filters: {
 					is_group: 0,
-					company: row.company
+					// company: row.company
 				}
 			};
 		});
