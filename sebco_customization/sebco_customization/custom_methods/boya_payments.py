@@ -73,7 +73,6 @@ class BoyaPayments:
         new_expense_doc.__v = self.expense_details['subcategory']['__v']
         new_expense_doc.updated_at_subcategory = self.expense_details['subcategory']['updatedAt']
 
-
         # handle team as a table
         # new_expense_doc.team = self.expense_details['team']
 
@@ -185,54 +184,94 @@ class BoyaPayments:
             self.abort_transaction = True
             return
         
+        # Get Boya Settings details
+        sebco_settings = frappe.get_single('Sebco Settings')
+        boya_account = sebco_settings.boya_expense_account
+        default_cost_center = sebco_settings.default_cost_center
+        default_company = sebco_settings.default_company
+        related_party_accounts = sebco_settings.boya_expense_company_account
+
+        # company and cost center of project owner
+        associated_company, associated_cost_center,project_name = None, None, None 
         # get project associated with expense
         project_list = frappe.get_list('Project', fields=['name','company','cost_center'], filters={
             'project_abbreviation': self.expense_doc.project_abbreviation
         })
 
-        associated_company, associated_cost_center = None, None # company and cost center of project owner
         if len(project_list):
             # get company associated with project
             associated_company = project_list[0]['company']
-            associated_cost_center = project_list[0]['cost_center']    
+            associated_cost_center = project_list[0]['cost_center'] 
+            project_name = project_list[0]['name'] 
 
-        # get account details
-        sebco_settings = frappe.get_single('Sebco Settings')
-        company_expense_accounts = sebco_settings.boya_expense_company_account
-        boya_expense_acc_name, boya_fees_acc_name = None, None
-        if associated_company:
-            filtered_list = list(filter(lambda x: x.company == associated_company, company_expense_accounts))
-            if len(filtered_list):
-                boya_expense_acc_name = filtered_list[0].expense_account
-                boya_fees_acc_name = filtered_list[0].bank_charges_account
+            if not associated_company or not associated_cost_center:
+                # create one journal entry within the main company in sebco settings
+                self.create_journal_with_default_settings(default_company,boya_account,default_cost_center)
+                return
         else:
-            associated_company = sebco_settings.main_company
-
-        if not boya_expense_acc_name:
-            boya_expense_acc_name = sebco_settings.boya_expense_account
-        if not boya_fees_acc_name:
-            boya_fees_acc_name = sebco_settings.bank_charges
-
-        supplier_expense_acc_no = self.expense_details['subcategory']['code']
-        if not boya_expense_acc_name or not boya_fees_acc_name:
-            # add a error log to boya expense
-            self.expense_doc.append('activity_logs_table',
-                {
-                    'activity': 'Fetching Expense/Bank Charges',
-                    'status': 'Failed',
-                    'description': 'Error occuring fetching expense account in Sebco Settings'
-                }
-            )
-            self.expense_doc.status = 'Failed'
-            self.expense_doc.save()
-            frappe.db.commit()
-
-            # Abort transaction
-            self.abort_transaction = True
+            # create one journal entry within the main company in sebco settings
+            self.create_journal_with_default_settings(default_company,boya_account,default_cost_center)
+            return
+    
+        # At this point the project, company and cost centers are defined
+        filtered_list = list(filter(lambda x: x.company == associated_company, related_party_accounts))
+        company_related_party_acc = None
+        if len(filtered_list):
+            company_related_party_acc = filtered_list[0].expense_account
+            related_party_within_company = filtered_list[0].related_party_account__within_company
+        else:
+            # create one journal entry within the main company in sebco settings
+            self.create_journal_with_default_settings(default_company,boya_account,default_cost_center)
+            return
+        
+        # define supplier expense account here or return
+        if not self.define_supplier_expense_acc(): 
+            return
+        
+        # get supplier account name in default company
+        supplier_acc_details = self.get_account_name(self.supplier_expense_acc_no, default_company)
+        if not supplier_acc_details['status']:
             return
 
+        supplier_acc_name = supplier_acc_details['account_name']
+        amount = self.expense_details['charge']
+        if associated_company  == default_company:
+            # create journal entry with default setting and add correct project
+            self.create_actual_journal_entry(amount,default_company,supplier_acc_name,boya_account,default_cost_center,'Bank Entry',project_name)
+            return
+        
+        # At this point any expense that gets here need have two journal entries one to cather 
+        # for double entry within the company of the project and another to cater for related 
+        # related_party_accounts i.e session blue paying for another company
+
+        # get supplier account name in host company
+        supplier_acc_details = self.get_account_name(self.supplier_expense_acc_no, associated_company)
+        if not supplier_acc_details['status']:
+            return
+        supplier_acc_name = supplier_acc_details['account_name']
+
+        # first entry in the default company
+        self.create_actual_journal_entry(amount,default_company,company_related_party_acc,boya_account,default_cost_center,'Inter Company Journal Entry',project_name)
+
+        # create the second entry within the host company (company whose payment are being made)
+        self.create_actual_journal_entry(amount,associated_company,supplier_acc_name,related_party_within_company,associated_cost_center,'Inter Company Journal Entry',project_name)
+        
+
+
+    def notification_received(self):
+        '''
+        Method that sends a callback notification back to Boya that the 
+        notification was recieved successfully
+        '''
+        pass
+
+    def define_supplier_expense_acc(self):
+        '''
+        Method used to define the correct supplier expense account
+        '''
         # Sebco accounts from are given in the following format
         # <Project Identifiers - varying number of letters><seven digits - actual account number>
+        supplier_expense_acc_no = self.expense_details['subcategory']['code']
         supplier_expense_acc_no = supplier_expense_acc_no[-7:]
         if len(supplier_expense_acc_no) != 7:
             # add a error log to boya expense
@@ -249,23 +288,71 @@ class BoyaPayments:
 
             # Abort transaction
             self.abort_transaction = True
-            return
+            return False
         
-        supplier_expense_acc_no = supplier_expense_acc_no[:4] + '/' + supplier_expense_acc_no[4:]
+        self.supplier_expense_acc_no = supplier_expense_acc_no[:4] + '/' + supplier_expense_acc_no[4:]
+        return True
 
-        account_list = frappe.get_list('Account', 
-            fields=['name'], filters={
-            'account_number': supplier_expense_acc_no,
-            'company': associated_company,
-        })
+    def create_actual_journal_entry(self,amount,company,debit_acc,credit_acc,cost_center,entry_type,project=None):
+        '''
+        Method that creates and save jounal entry based on given parameters
+        '''
+        try:
+            # Create a new journal entry
+            new_journal_entry = frappe.new_doc('Journal Entry')
+            new_journal_entry.voucher_type = entry_type
+            new_journal_entry.company = company
+            transaction_date = self.expense_details['transaction_date'].split('T')[0]
+            new_journal_entry.posting_date = transaction_date
+            new_journal_entry.cheque_no = self.expense_details['provider_ref'],
+            new_journal_entry.cheque_date = transaction_date
+            new_journal_entry.bill_no = self.expense_details['transaction_ref']
 
-        if not len(account_list):
-            # add a error log to boya expense
+            # Do one journal entry affecting the the main company only
+            new_journal_entry.append('accounts', {
+                'account': debit_acc,
+                'debit_in_account_currency': amount,
+                'credit_in_account_currency': 0.0,
+                'cost_center': cost_center,
+                'project': project
+            })
+            new_journal_entry.append('accounts', {
+                'account': credit_acc,
+                'debit_in_account_currency': 0.0,
+                'credit_in_account_currency': amount,
+                'cost_center': cost_center,
+                'project': project
+            })
+
+            # add description
+            new_journal_entry.user_remark = self.expense_details['notes']
+            
+            # Add all the required details for the journal entry
+            new_journal_entry.save()
+
+            # submit the journal entry
+            new_journal_entry.submit()
+
             self.expense_doc.append('activity_logs_table',
                 {
-                    'activity': 'Getting Expense Account',
+                    'activity': 'Creating journal entry',
+                    'status': 'Successful',
+                    'description': 'Journal entry created successfully'
+                }
+            )
+            self.expense_doc.status = 'Complete'
+            self.expense_doc.linked_journal_entry = new_journal_entry.name
+            self.expense_doc.save()
+            frappe.db.commit()
+
+            return True
+        except Exception as err:
+            # one of the failures gotten from this is when the budget is exceeded we should add functionality to take care of this or instead do not stop actual transaction but rather on material request. Use just a warning instead
+            self.expense_doc.append('activity_logs_table',
+                {
+                    'activity': 'Creating journal entry',
                     'status': 'Failed',
-                    'description': 'The account number: {} does not exist.'.format(supplier_expense_acc_no)
+                    'description': 'An error occured while creating Journal entry: check the following details: accounts, budget amount'
                 }
             )
             self.expense_doc.status = 'Failed'
@@ -274,90 +361,52 @@ class BoyaPayments:
 
             # Abort transaction
             self.abort_transaction = True
-            return    
+            return False
+
+    def get_account_name(self,account_number, company):
+        '''
+        Get the correct account name based on the account number and the company
+        '''
+        account_list = frappe.get_list('Account', 
+            fields=['name'], filters={
+            'account_number': account_number,
+            'company': company,
+        })
+
+        if not len(account_list):
+            # add a error log to boya expense
+            self.expense_doc.append('activity_logs_table',
+                {
+                    'activity': 'Getting Expense Account',
+                    'status': 'Failed',
+                    'description': 'The account number: {} does not exist.'.format(account_number)
+                }
+            )
+            self.expense_doc.status = 'Failed'
+            self.expense_doc.save()
+            frappe.db.commit()
+
+            # Abort transaction
+            self.abort_transaction = True
+            return {'status': False}
 
         supplier_expense_acc_name = account_list[0]['name']
-        transaction_date = self.expense_details['transaction_date'].split('T')[0]
-        # Create a new journal entry
-        new_journal_entry = frappe.new_doc('Journal Entry')
-        new_journal_entry.voucher_type = 'Bank Entry'
-        new_journal_entry.posting_date = transaction_date
-        new_journal_entry.cheque_no = self.expense_details['provider_ref'],
-        new_journal_entry.cheque_date = transaction_date
-        new_journal_entry.bill_no = self.expense_details['transaction_ref']
-        if associated_company and associated_cost_center:
-            new_journal_entry.company = associated_company
+        return {'status': True, 'account_name': supplier_expense_acc_name}
 
-            # credit account
-            new_journal_entry.append('accounts', {
-                'account': boya_expense_acc_name,
-                'debit_in_account_currency': 0,
-                'credit_in_account_currency': self.expense_details['charge'],
-                'cost_center': associated_cost_center
-            })
-            # debit account (Amount)
-            new_journal_entry.append('accounts', {
-                'account': supplier_expense_acc_name,
-                'debit_in_account_currency': self.expense_details['amount'],
-                'credit_in_account_currency': 0,
-                'cost_center': associated_cost_center
-            })
-            # debit account (Charge/Fees)
-            new_journal_entry.append('accounts', {
-                'account': boya_fees_acc_name,
-                'debit_in_account_currency': self.expense_details['fees'],
-                'credit_in_account_currency': 0,
-                'cost_center': associated_cost_center
-            })
-        else:
-            # credit account
-            new_journal_entry.append('accounts', {
-                'account': boya_expense_acc_name,
-                'debit_in_account_currency': 0,
-                'credit_in_account_currency': self.expense_details['charge']
-            })
-            # debit account (Amount)
-            new_journal_entry.append('accounts', {
-                'account': supplier_expense_acc_name,
-                'debit_in_account_currency': self.expense_details['amount'],
-                'credit_in_account_currency': 0
-            })
-            # debit account (Charge/Fees)
-            new_journal_entry.append('accounts', {
-                'account': boya_fees_acc_name,
-                'debit_in_account_currency': self.expense_details['fees'],
-                'credit_in_account_currency': 0
-            })
-
-        # add description
-        new_journal_entry.user_remark = self.expense_details['notes']
-        
-        # Add all the required details for the journal entry
-        new_journal_entry.save()
-
-        # submit the journal entry
-        new_journal_entry.submit()
-
-        # add success log to boya expense
-        self.expense_doc.append('activity_logs_table',
-            {
-                'activity': 'Posting Expense to Journal Entry',
-                'status': 'Success',
-                'description': f'Successfully posted to Journal Entry: {new_journal_entry.name}'
-            }
-        )
-        self.expense_doc.save()
-        frappe.db.commit()
-
-        # update the status of expense
-        self.expense_doc.status = 'Complete'
-        self.expense_doc.linked_journal_entry = new_journal_entry.name
-        self.expense_doc.save()
-        frappe.db.commit()
-
-    def notification_received(self):
+    def create_journal_with_default_settings(self,default_company,boya_account,default_cost_center):
         '''
-        Method that sends a callback notification back to Boya that the 
-        notification was recieved successfully
+        Method that runs the creation of journal entry using the default settings i.e
+        session blue settings
         '''
-        pass
+        # define supplier expense account here or return
+        if not self.define_supplier_expense_acc(): return
+
+        # get supplier account name
+        supplier_acc_details = self.get_account_name(self.supplier_expense_acc_no, default_company)
+        if not supplier_acc_details['status']:return
+    
+        # the project is not defined hence place the expense under main company 
+        amount = self.expense_details['charge']
+        debit_acc = supplier_acc_details['account_name']
+        # create one journal entry
+        creation_status = self.create_actual_journal_entry(amount,default_company,debit_acc,boya_account,default_cost_center,'Bank Entry')
