@@ -192,7 +192,7 @@ class BoyaPayments:
         related_party_accounts = sebco_settings.boya_expense_company_account
 
         # company and cost center of project owner
-        associated_company, associated_cost_center,project_name = None, None, None 
+        associated_company, associated_cost_center,project_name, self.defined_project = None, None, None, None 
         # get project associated with expense
         project_list = frappe.get_list('Project', fields=['name','company','cost_center'], filters={
             'project_abbreviation': self.expense_doc.project_abbreviation
@@ -245,6 +245,8 @@ class BoyaPayments:
                 frappe.db.commit()
 
             if not associated_company or not associated_cost_center:
+                # define project as part of self
+                self.defined_project = project_name
                 # create one journal entry within the main company in sebco settings
                 self.create_journal_with_default_settings(default_company,boya_account,default_cost_center)
                 return
@@ -260,6 +262,8 @@ class BoyaPayments:
             company_related_party_acc = filtered_list[0].expense_account
             related_party_within_company = filtered_list[0].related_party_account__within_company
         else:
+            # define project as part of self
+            self.defined_project = project_name
             # create one journal entry within the main company in sebco settings
             self.create_journal_with_default_settings(default_company,boya_account,default_cost_center)
             return
@@ -449,4 +453,4 @@ class BoyaPayments:
         amount = self.expense_details['charge']
         debit_acc = supplier_acc_details['account_name']
         # create one journal entry
-        creation_status = self.create_actual_journal_entry(amount,default_company,debit_acc,boya_account,default_cost_center,'Bank Entry')
+        creation_status = self.create_actual_journal_entry(amount,default_company,debit_acc,boya_account,default_cost_center,'Bank Entry',self.defined_project)
