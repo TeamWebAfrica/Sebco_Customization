@@ -202,7 +202,47 @@ class BoyaPayments:
             # get company associated with project
             associated_company = project_list[0]['company']
             associated_cost_center = project_list[0]['cost_center'] 
-            project_name = project_list[0]['name'] 
+            project_name = project_list[0]['name']
+
+            # check all the required values are defined
+            if not associated_company:
+                # add a error log to boya expense
+                self.expense_doc.append('activity_logs_table',
+                    {
+                        'activity': 'Creating Journal Entry',
+                        'status': 'Failed',
+                        'description': 'The associated company in related project is not defined'
+                    }
+                )
+                self.expense_doc.status = 'Failed'
+                self.expense_doc.save()
+                frappe.db.commit()
+            
+            if not associated_cost_center:
+                # add a error log to boya expense
+                self.expense_doc.append('activity_logs_table',
+                    {
+                        'activity': 'Creating Journal Entry',
+                        'status': 'Failed',
+                        'description': 'The associated cost center in related project is not defined'
+                    }
+                )
+                self.expense_doc.status = 'Failed'
+                self.expense_doc.save()
+                frappe.db.commit()
+
+            if not project_name:
+                # add a error log to boya expense
+                self.expense_doc.append('activity_logs_table',
+                    {
+                        'activity': 'Creating Journal Entry',
+                        'status': 'Failed',
+                        'description': 'The associated project_name in related project is not defined'
+                    }
+                )
+                self.expense_doc.status = 'Failed'
+                self.expense_doc.save()
+                frappe.db.commit()
 
             if not associated_company or not associated_cost_center:
                 # create one journal entry within the main company in sebco settings
