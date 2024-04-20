@@ -40,6 +40,10 @@ class BoyaPayments:
         
         # create a new expense
         new_expense_doc = frappe.new_doc('Boya Expense')
+        new_expense_doc.complete_request_data = str(self.expense_details)
+        new_expense_doc.save()
+        frappe.db.commit()
+
         # add all the details from Boya
         new_expense_doc.id = self.expense_details['_id']
         new_expense_doc.transaction_ref = self.expense_details['transaction_ref']
@@ -110,7 +114,7 @@ class BoyaPayments:
         new_expense_doc.vendor = self.expense_details['vendor']
 
         # Add complete request data log here
-        new_expense_doc.complete_request_data = str(self.expense_details)
+        # new_expense_doc.complete_request_data = str(self.expense_details)
 
         # add project abbreviations
         new_expense_doc.project_abbreviation = self.expense_details['subcategory']['code'][:-7]
