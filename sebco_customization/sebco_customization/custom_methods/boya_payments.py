@@ -1,5 +1,6 @@
 import frappe
 from datetime import datetime
+import pdb
 
 class BoyaPayments:
     '''
@@ -45,61 +46,62 @@ class BoyaPayments:
         frappe.db.commit()
 
         # add all the details from Boya
-        new_expense_doc.id = self.expense_details['_id']
-        new_expense_doc.transaction_ref = self.expense_details['transaction_ref']
-        new_expense_doc.provider_ref = self.expense_details['provider_ref']
-        new_expense_doc.amount = self.expense_details['amount']
-        new_expense_doc.fees = self.expense_details['fees']
-        new_expense_doc.charge = self.expense_details['charge']
-        new_expense_doc.original_currency = self.expense_details['original_currency']
+        new_expense_doc.id = self.get_values(['_id'])
+        new_expense_doc.transaction_ref = self.get_values(['transaction_ref'])
+        new_expense_doc.provider_ref = self.get_values(['provider_ref'])
+        new_expense_doc.amount = self.get_values(['amount'])
+        new_expense_doc.fees = self.get_values(['fees'])
+        new_expense_doc.charge = self.get_values(['charge'])
+        new_expense_doc.original_currency = self.get_values(['original_currency'])
         # new_expense_doc.original_amount = self.expense_details['original_amount']
-        new_expense_doc.employee_id = self.expense_details['employee_id']
-        new_expense_doc.person = self.expense_details['person']
-        new_expense_doc.merchant_category_code = self.expense_details['MerchantCategoryCode']
-        new_expense_doc.fx_rate = self.expense_details['fx_rate']
-        new_expense_doc.card_vcn = self.expense_details['card_vcn']
-        new_expense_doc.reciever = self.expense_details['receiver']
-        new_expense_doc.account_no = self.expense_details['accno']
-        new_expense_doc.payment_type = self.expense_details['payment_type']
-        new_expense_doc.channel = self.expense_details['channel']
+        new_expense_doc.employee_id = self.get_values(['employee_id'])
+        new_expense_doc.person = self.get_values(['person'])
+        new_expense_doc.merchant_category_code = self.get_values(['MerchantCategoryCode'])
+        new_expense_doc.fx_rate = self.get_values(['fx_rate'])
+        new_expense_doc.card_vcn = self.get_values(['card_vcn'])
+        new_expense_doc.reciever = self.get_values(['receiver'])
+        new_expense_doc.account_no = self.get_values(['accno'])
+        new_expense_doc.payment_type = self.get_values(['payment_type'])
+        new_expense_doc.channel = self.get_values(['channel'])
 
         # handle sub category as  table
         # new_expense_doc.subcategory = self.expense_details['subcategory']
-        new_expense_doc.subcategory_id = self.expense_details['subcategory']['_id']
-        new_expense_doc.group_id = self.expense_details['subcategory']['group_id']
-        new_expense_doc.category = self.expense_details['subcategory']['category']
-        new_expense_doc.sub_category_status = self.expense_details['subcategory']['status']
-        new_expense_doc.code = self.expense_details['subcategory']['code']
-        new_expense_doc.name1 = self.expense_details['subcategory']['name']
-        new_expense_doc.description = self.expense_details['subcategory']['description']
-        new_expense_doc.mapping_id = self.expense_details['subcategory']['mapping_id']
-        new_expense_doc.created_at_subcategory = self.expense_details['subcategory']['createdAt']
-        new_expense_doc.__v = self.expense_details['subcategory']['__v']
-        new_expense_doc.updated_at_subcategory = self.expense_details['subcategory']['updatedAt']
+        new_expense_doc.subcategory_id = self.get_values(['subcategory','_id'])
+        new_expense_doc.group_id = self.get_values(['subcategory','group_id'])
+        new_expense_doc.category = self.get_values(['subcategory','category'])
+        new_expense_doc.sub_category_status = self.get_values(['subcategory','status'])
+        new_expense_doc.code = self.get_values(['subcategory','code'])
+        new_expense_doc.name1 = self.get_values(['subcategory','name'])
+        new_expense_doc.description = self.get_values(['subcategory','description'])
+        new_expense_doc.mapping_id = self.get_values(['subcategory','mapping_id'])
+        new_expense_doc.created_at_subcategory = self.get_values(['subcategory','createdAt'])
+        new_expense_doc.__v = self.get_values(['subcategory','__v'])
+        new_expense_doc.updated_at_subcategory = self.get_values(['subcategory','updatedAt'])
 
         # handle team as a table
         # new_expense_doc.team = self.expense_details['team']
 
-        new_expense_doc.currency = self.expense_details['currency']
+        new_expense_doc.currency = self.get_values(['currency'])
 
         # handle tag as a list/ table
         # new_expense_doc.tag = self.expense_details['tag']
 
-        new_expense_doc.notes = self.expense_details['notes']
+        new_expense_doc.notes = self.get_values(['notes'])
 
         # Add attachements here
-        if self.expense_details['attachments'] and len(self.expense_details['attachments']):
-            for attachement in self.expense_details['attachments']:
+        if self.get_values(['attachments']) and len(self.get_values(['attachments'])):
+            for attachement in self.get_values(['attachments']):
                 new_expense_doc.append("attachments", {
 					"attachment_url":attachement,
 				})
 
-        new_expense_doc.payment_status = self.expense_details['payment_status']
-        new_expense_doc.boya_status = self.expense_details['status']
+        new_expense_doc.payment_status = self.get_values(['payment_status'])
+        new_expense_doc.boya_status = self.get_values(['status'])
 
         # Add reviews here
-        if self.expense_details['reviews'] and len(self.expense_details['reviews']):
-            for review in self.expense_details['reviews']:
+        reviews = self.get_values(['reviews'])
+        if reviews and len(reviews):
+            for review in reviews:
                 new_expense_doc.append("reviews", {
 					"person": review['person'],
                     "reviewed_on": review['reviewed_on'],
@@ -107,17 +109,24 @@ class BoyaPayments:
                     "status": review['status']
 				})
 
-        new_expense_doc.exported = self.expense_details['exported']
-        new_expense_doc.sync_successful = self.expense_details['sync_successful']
+        new_expense_doc.exported = self.get_values(['exported'])
+        new_expense_doc.sync_successful = self.get_values(['sync_successful'])
         # new_expense_doc.external_sync_id = self.expense_details['external_sync_id']
         # new_expense_doc.sync_error = self.expense_details['sync_error']
-        new_expense_doc.vendor = self.expense_details['vendor']
+        new_expense_doc.vendor = self.get_values(['vendor'])
 
         # Add complete request data log here
         # new_expense_doc.complete_request_data = str(self.expense_details)
 
         # add project abbreviations
-        new_expense_doc.project_abbreviation = self.expense_details['subcategory']['code'][:-7]
+        sub_category_code = self.get_values(['subcategory','code'])
+        project_abbreviation = None
+        if sub_category_code:
+            try:
+                project_abbreviation = sub_category_code[:-7]
+            except:
+                pass
+        new_expense_doc.project_abbreviation = project_abbreviation
         
         # save new expense
         new_expense_doc.save()
@@ -458,3 +467,18 @@ class BoyaPayments:
         debit_acc = supplier_acc_details['account_name']
         # create one journal entry
         creation_status = self.create_actual_journal_entry(amount,default_company,debit_acc,boya_account,default_cost_center,'Bank Entry',self.defined_project)
+
+    def get_values(self,keys):
+        # Initialize a variable to hold the current level of the dictionary
+        current_dict = self.expense_details
+
+        # Traverse through each key in the list
+        for key in keys:
+            if key in current_dict:
+                current_dict = current_dict[key]
+            else:
+                return None  
+                    
+        return current_dict
+    
+        
