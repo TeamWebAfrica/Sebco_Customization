@@ -318,7 +318,6 @@
   {
    "fieldname": "complete_request_data",
    "fieldtype": "Text",
-   "hidden": 1,
    "label": "Complete Request Data"
   },
   {
@@ -376,13 +375,12 @@
   {
    "fieldname": "complete_request_data_json",
    "fieldtype": "JSON",
-   "label": "Complete Request Data",
-   "read_only": 1
+   "label": "Complete Request Data"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-04-27 18:51:04.207486",
+ "modified": "2024-04-27 23:17:11.323702",
  "modified_by": "Administrator",
  "module": "Sebco Customization",
  "name": "Boya Expense",
