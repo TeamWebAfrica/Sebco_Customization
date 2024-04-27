@@ -1,6 +1,5 @@
 import frappe, json
 from datetime import datetime
-import pdb
 
 class BoyaPayments:
     '''
@@ -23,8 +22,14 @@ class BoyaPayments:
         This is the main methods that calls all the other class methods to handle an
         expense notification from Boya
         '''
-        self.retry_get_or_create_boya_expense()
+        # Run the retry transaction method
+        transaction_details = self.retry_get_or_create_boya_expense()
+        if not transaction_details['status']:
+            return transaction_details
+        
+        # Create journal entry if the retrial was successful
         self.create_journal_entry()
+        return { 'status': True }
 
     def get_or_create_boya_expense(self):
         '''
@@ -148,83 +153,65 @@ class BoyaPayments:
         '''
         Methods that attempts to retry processing of the expense
         '''
-        # set the expense doc
-        boya_expense_list = frappe.get_list('Boya Expense', fields=['name'], filters={
-            'transaction_ref': self.expense_details['transaction_ref']
-        })
-        if not len(boya_expense_list):
-            error = 'Error accessing this expense account in database. Please try again'
-            return { "status": False, "error": error}
-
-        # get the expense doc for the requested expense
-        expense_doc_name = boya_expense_list[0]['name']
-        try:
-            expense_doc = frappe.get_doc("Boya Expense",expense_doc_name)
-            if not expense_doc:
-                error = 'Error accessing this expense account in database. Please try again'
-                return { "status": False, "error": error}
-        except:
-            expense_doc = frappe.get_doc("Boya Expense",self.expense_details['transaction_ref'])
-            if not expense_doc:
-                error = 'Error accessing this expense account in database. Please try again'
-                return { "status": False, "error": error}
-        self.expense_doc = expense_doc
+        # define expense_doc as self.expense_doc 
+        expense_doc = self.expense_doc
 
         # Can only retry transaction whose statuses are are Pending, Draft or Failed
         retry_statuses = ['Pending', 'Draft', 'Failed']
         if self.expense_doc.status not in retry_statuses:
-            return 
+            return { "status": False, 
+                    "error": "This action is only allowed for Pending, Draft and Failed Expenses"}
 
         # Check that the transaction is not marked as aborted
         if self.abort_transaction:
-            return 
+            return { "status": False, 
+                    "error": "An error occured please contact support"}
         
-        # check tha the expense details were defined
+        # check that the expense details were defined
         if not self.expense_details:
-            return
+            return { "status": False, "error": "This Expense is blank"}
         
         # add all the details from Boya
-        expense_doc.id = self.get_values(['_id'])
-        expense_doc.transaction_ref = self.get_values(['transaction_ref'])
-        expense_doc.provider_ref = self.get_values(['provider_ref'])
-        expense_doc.amount = self.get_values(['amount'])
-        expense_doc.fees = self.get_values(['fees'])
-        expense_doc.charge = self.get_values(['charge'])
-        expense_doc.original_currency = self.get_values(['original_currency'])
+        expense_doc.id = self.get_only_nil_values(expense_doc.id,['_id'])
+        expense_doc.transaction_ref = self.get_only_nil_values(expense_doc.transaction_ref,['transaction_ref'])
+        expense_doc.provider_ref = self.get_only_nil_values(expense_doc.provider_ref,['provider_ref'])
+        expense_doc.amount = self.get_only_nil_values(expense_doc.amount,['amount'])
+        expense_doc.fees = self.get_only_nil_values(expense_doc.amount,['fees'])
+        expense_doc.charge = self.get_only_nil_values(expense_doc.charge,['charge'])
+        expense_doc.original_currency = self.get_only_nil_values(expense_doc.original_currency,['original_currency'])
         # new_expense_doc.original_amount = self.expense_details['original_amount']
-        expense_doc.employee_id = self.get_values(['employee_id'])
-        expense_doc.person = self.get_values(['person'])
-        expense_doc.merchant_category_code = self.get_values(['MerchantCategoryCode'])
-        expense_doc.fx_rate = self.get_values(['fx_rate'])
-        expense_doc.card_vcn = self.get_values(['card_vcn'])
-        expense_doc.reciever = self.get_values(['receiver'])
-        expense_doc.account_no = self.get_values(['accno'])
-        expense_doc.payment_type = self.get_values(['payment_type'])
-        expense_doc.channel = self.get_values(['channel'])
+        expense_doc.employee_id = self.get_only_nil_values(expense_doc.employee_id,['employee_id'])
+        expense_doc.person = self.get_only_nil_values(expense_doc.person,['person'])
+        expense_doc.merchant_category_code = self.get_only_nil_values(expense_doc.merchant_category_code,['MerchantCategoryCode'])
+        expense_doc.fx_rate = self.get_only_nil_values(expense_doc.fx_rate,['fx_rate'])
+        expense_doc.card_vcn = self.get_only_nil_values(expense_doc.card_vcn,['card_vcn'])
+        expense_doc.reciever = self.get_only_nil_values(expense_doc.reciever,['receiver']) 
+        expense_doc.account_no = self.get_only_nil_values(expense_doc.account_no,['accno'])
+        expense_doc.payment_type = self.get_only_nil_values(expense_doc.payment_type,['payment_type'])
+        expense_doc.channel = self.get_only_nil_values(expense_doc.channel,['channel'])
 
         # handle sub category as table
         expense_doc.subcategory = self.expense_details['subcategory']
-        expense_doc.subcategory_id = self.get_values(['subcategory','_id'])
-        expense_doc.group_id = self.get_values(['subcategory','group_id'])
-        expense_doc.category = self.get_values(['subcategory','category'])
-        expense_doc.sub_category_status = self.get_values(['subcategory','status'])
-        expense_doc.code = self.get_values(['subcategory','code'])
-        expense_doc.name1 = self.get_values(['subcategory','name'])
-        expense_doc.description = self.get_values(['subcategory','description'])
-        expense_doc.mapping_id = self.get_values(['subcategory','mapping_id'])
-        expense_doc.created_at_subcategory = self.get_values(['subcategory','createdAt'])
-        expense_doc.__v = self.get_values(['subcategory','__v'])
-        expense_doc.updated_at_subcategory = self.get_values(['subcategory','updatedAt'])
+        expense_doc.subcategory_id = self.get_only_nil_values(expense_doc.subcategory_id,['subcategory','_id'])
+        expense_doc.group_id = self.get_only_nil_values(expense_doc.group_id,['subcategory','group_id'])
+        expense_doc.category = self.get_only_nil_values(expense_doc.category,['subcategory','category'])
+        expense_doc.sub_category_status = self.get_only_nil_values(expense_doc.sub_category_status,['subcategory','status'])
+        expense_doc.code = self.get_only_nil_values(expense_doc.code,['subcategory','code'])
+        expense_doc.name1 = self.get_only_nil_values(expense_doc.name1,['subcategory','name'])
+        expense_doc.description = self.get_only_nil_values(expense_doc.description,['subcategory','description'])
+        expense_doc.mapping_id = self.get_only_nil_values(expense_doc.mapping_id,['subcategory','mapping_id'])
+        expense_doc.created_at_subcategory = self.get_only_nil_values(expense_doc.created_at_subcategory,['subcategory','createdAt'])
+        # expense_doc.__v = self.get_only_nil_values(expense_doc.__v,['subcategory','__v'])
+        # expense_doc.updated_at_subcategory = self.get_only_nil_values(expense_doc.updated_at_subcategory,['subcategory','updatedAt'])
 
         # handle team as a table
         # expense_doc.team = self.expense_details['team']
-
-        expense_doc.currency = self.get_values(['currency'])
+        self.currency = self.get_only_nil_values(expense_doc.currency,['currency'])
 
         # handle tag as a list/ table
         # new_expense_doc.tag = self.expense_details['tag']
 
-        expense_doc.notes = self.get_values(['notes'])
+        expense_doc.notes = self.get_only_nil_values(expense_doc.notes,['notes'])
 
         # Add attachements here
         if self.get_values(['attachments']) and len(self.get_values(['attachments'])):
@@ -233,8 +220,8 @@ class BoyaPayments:
 					"attachment_url":attachement,
 				})
 
-        expense_doc.payment_status = self.get_values(['payment_status'])
-        expense_doc.boya_status = self.get_values(['status'])
+        expense_doc.payment_status = self.get_only_nil_values(expense_doc.payment_status,['payment_status'])
+        expense_doc.boya_status = self.get_only_nil_values(expense_doc.boya_status,['status'])
 
         # Add reviews here
         reviews = self.get_values(['reviews'])
@@ -247,31 +234,35 @@ class BoyaPayments:
                     "status": review['status']
 				})
 
-        expense_doc.exported = self.get_values(['exported'])
-        expense_doc.sync_successful = self.get_values(['sync_successful'])
+        expense_doc.exported = self.get_only_nil_values(expense_doc.exported,['exported'])
+        expense_doc.sync_successful = self.get_only_nil_values(expense_doc.sync_successful,['sync_successful'])
         # new_expense_doc.external_sync_id = self.expense_details['external_sync_id']
         # new_expense_doc.sync_error = self.expense_details['sync_error']
-        expense_doc.vendor = self.get_values(['vendor'])
+        expense_doc.vendor = self.get_only_nil_values(expense_doc.vendor,['vendor'])
 
         # Add complete request data log here
         # new_expense_doc.complete_request_data = str(self.expense_details)
 
         # add project abbreviations
-        sub_category_code = self.get_values(['subcategory','code'])
+        sub_category_code = self.get_only_nil_values(expense_doc.code,['subcategory','code'])
         project_abbreviation = None
         if sub_category_code:
             try:
                 project_abbreviation = sub_category_code[:-7]
             except:
                 pass
-        expense_doc.project_abbreviation = project_abbreviation
+        if not expense_doc.project_abbreviation:
+            expense_doc.project_abbreviation = project_abbreviation
         
         # save new expense
         expense_doc.save()
         frappe.db.commit()
 
         # set class expense_doc
-        self.expense_doc = expense_doc
+        if not self.expense_doc:
+            self.expense_doc = expense_doc
+
+        return { 'status': True }
 
     def create_journal_entry(self):
         '''
@@ -439,7 +430,7 @@ class BoyaPayments:
             return
 
         supplier_acc_name = supplier_acc_details['account_name']
-        amount = self.expense_details['charge']
+        amount = self.expense_doc.charge
         if associated_company  == default_company:
             # create journal entry with default setting and add correct project
             self.create_actual_journal_entry(amount,default_company,supplier_acc_name,boya_account,default_cost_center,'Bank Entry',project_name)
@@ -480,7 +471,11 @@ class BoyaPayments:
         try:
             # Sebco accounts from are given in the following format
             # <Project Identifiers - varying number of letters><seven digits - actual account number>
-            supplier_expense_acc_no = self.expense_details['subcategory']['code']
+            if self.expense_doc.code:
+                supplier_expense_acc_no = self.expense_doc.code
+            else:
+                supplier_expense_acc_no = self.expense_details['subcategory']['code']
+
             supplier_expense_acc_no = supplier_expense_acc_no[-7:]
             if len(supplier_expense_acc_no) != 7:
                 # add a error log to boya expense
@@ -649,12 +644,21 @@ class BoyaPayments:
                 return ''
                     
         return current_dict
+
+    def get_only_nil_values(self,current_value,keys):
+        '''
+        Method that will retunr the current values of the field in the doc or get its values from request
+        if its values if nil
+        '''
+        if current_value:
+            return current_value
+        else:
+            return self.get_values(keys)
     
     def add_error_logs(self,document_status,activity,status,description):
         '''
         Method that is used to add logs to the expense docuemnt
         '''
-        # pdb.set_trace()
         # add a error log to boya expense
         self.expense_doc.append('activity_logs_table',
             {
@@ -691,6 +695,7 @@ def retry_processing(filters=None):
     # get request details from kwargs
     expense_details = json.loads(doc.complete_request_data_json)
     boya_payment = BoyaPayments(expense_details)
+    boya_payment.expense_doc = doc
     process_details = boya_payment.retry_process_expense_notification()
     try:
         if not process_details['status']:
@@ -701,8 +706,7 @@ def retry_processing(filters=None):
              'error': 'Error occured while retrying transaction check the details and try again'}
     
     # If everything works return success message
-    return  { 'status': True,
-             'error': 'Successfully retrying transaction' }
+    return  { 'status': True, 'message': 'Successfully retried transaction' }
 
 
 
