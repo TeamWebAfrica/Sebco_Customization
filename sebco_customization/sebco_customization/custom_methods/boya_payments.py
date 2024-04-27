@@ -695,14 +695,14 @@ def retry_processing(filters=None):
     try:
         if not process_details['status']:
             return  { 'status': process_details['status'],
-             'message': process_details['error'] }
+             'error': process_details['error'] }
     except:
         return  { 'status': False,
-             'message': 'Error occured while retrying transaction please try again'}
+             'error': 'Error occured while retrying transaction check the details and try again'}
     
     # If everything works return success message
     return  { 'status': True,
-             'message': 'Successfully retrying transaction' }
+             'error': 'Successfully retrying transaction' }
 
 
 
