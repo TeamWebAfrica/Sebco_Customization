@@ -421,11 +421,21 @@ class BoyaPayments:
         
         # define supplier expense account here or return
         if not self.define_supplier_expense_acc(): 
+            doc_status = "Failed",
+            activity = "Getting supplier expense account"
+            status = "Failed"
+            description = "The supplier expense account is not defined"
+            self.add_error_logs(doc_status,activity,status,description)
             return
         
         # get supplier account name in default company
         supplier_acc_details = self.get_account_name(self.supplier_expense_acc_no, default_company)
         if not supplier_acc_details['status']:
+            doc_status = "Failed",
+            activity = "Getting supplier account name"
+            status = "Failed"
+            description = "The supplier account name is not defined"
+            self.add_error_logs(doc_status,activity,status,description)
             return
 
         supplier_acc_name = supplier_acc_details['account_name']
@@ -442,6 +452,11 @@ class BoyaPayments:
         # get supplier account name in host company
         supplier_acc_details = self.get_account_name(self.supplier_expense_acc_no, associated_company)
         if not supplier_acc_details['status']:
+            doc_status = "Failed",
+            activity = "Getting supplier account name"
+            status = "Failed"
+            description = "The supplier account name is not defined"
+            self.add_error_logs(doc_status,activity,status,description)
             return
         supplier_acc_name = supplier_acc_details['account_name']
 
@@ -451,8 +466,6 @@ class BoyaPayments:
         # create the second entry within the host company (company whose payment are being made)
         self.create_actual_journal_entry(amount,associated_company,supplier_acc_name,related_party_within_company,associated_cost_center,'Inter Company Journal Entry',project_name)
         
-
-
     def notification_received(self):
         '''
         Method that sends a callback notification back to Boya that the 
@@ -464,29 +477,32 @@ class BoyaPayments:
         '''
         Method used to define the correct supplier expense account
         '''
-        # Sebco accounts from are given in the following format
-        # <Project Identifiers - varying number of letters><seven digits - actual account number>
-        supplier_expense_acc_no = self.expense_details['subcategory']['code']
-        supplier_expense_acc_no = supplier_expense_acc_no[-7:]
-        if len(supplier_expense_acc_no) != 7:
-            # add a error log to boya expense
-            self.expense_doc.append('activity_logs_table',
-                {
-                    'activity': 'Checking Account Validity',
-                    'status': 'Failed',
-                    'description': 'Every account should be made of 7 digits apart from project identifiers'.format(supplier_expense_acc_no)
-                }
-            )
-            self.expense_doc.status = 'Failed'
-            self.expense_doc.save()
-            frappe.db.commit()
+        try:
+            # Sebco accounts from are given in the following format
+            # <Project Identifiers - varying number of letters><seven digits - actual account number>
+            supplier_expense_acc_no = self.expense_details['subcategory']['code']
+            supplier_expense_acc_no = supplier_expense_acc_no[-7:]
+            if len(supplier_expense_acc_no) != 7:
+                # add a error log to boya expense
+                self.expense_doc.append('activity_logs_table',
+                    {
+                        'activity': 'Checking Account Validity',
+                        'status': 'Failed',
+                        'description': 'Every account should be made of 7 digits apart from project identifiers'.format(supplier_expense_acc_no)
+                    }
+                )
+                self.expense_doc.status = 'Failed'
+                self.expense_doc.save()
+                frappe.db.commit()
 
-            # Abort transaction
-            self.abort_transaction = True
+                # Abort transaction
+                self.abort_transaction = True
+                return False
+            
+            self.supplier_expense_acc_no = supplier_expense_acc_no[:4] + '/' + supplier_expense_acc_no[4:]
+            return True
+        except:
             return False
-        
-        self.supplier_expense_acc_no = supplier_expense_acc_no[:4] + '/' + supplier_expense_acc_no[4:]
-        return True
 
     def create_actual_journal_entry(self,amount,company,debit_acc,credit_acc,cost_center,entry_type,project=None):
         '''
@@ -594,11 +610,23 @@ class BoyaPayments:
         session blue settings
         '''
         # define supplier expense account here or return
-        if not self.define_supplier_expense_acc(): return
+        if not self.define_supplier_expense_acc(): 
+            doc_status = "Failed",
+            activity = "Getting supplier expense account"
+            status = "Failed"
+            description = "The supplier expense account is not defined"
+            self.add_error_logs(doc_status,activity,status,description)
+            return
 
         # get supplier account name
         supplier_acc_details = self.get_account_name(self.supplier_expense_acc_no, default_company)
-        if not supplier_acc_details['status']:return
+        if not supplier_acc_details['status']:
+            doc_status = "Failed",
+            activity = "Getting supplier account details"
+            status = "Failed"
+            description = "The supplier account details are not defined"
+            self.add_error_logs(doc_status,activity,status,description)
+            return
     
         # the project is not defined hence place the expense under main company 
         amount = self.expense_details['charge']
@@ -621,6 +649,23 @@ class BoyaPayments:
                 return ''
                     
         return current_dict
+    
+    def add_error_logs(self,document_status,activity,status,description):
+        '''
+        Method that is used to add logs to the expense docuemnt
+        '''
+        # pdb.set_trace()
+        # add a error log to boya expense
+        self.expense_doc.append('activity_logs_table',
+            {
+                'activity': activity,
+                'status': status,
+                'description': description
+            }
+        )
+        self.expense_doc.status = "Failed"
+        self.expense_doc.save()
+        frappe.db.commit()
     
 @frappe.whitelist()
 def retry_processing(filters=None):
@@ -647,9 +692,20 @@ def retry_processing(filters=None):
     expense_details = json.loads(doc.complete_request_data_json)
     boya_payment = BoyaPayments(expense_details)
     process_details = boya_payment.retry_process_expense_notification()
-    # if not process_details['status']:
-    #     return { 'status': False, 'error': process_details['error'] }
-
-
-    return  {  'status': True,
+    try:
+        if not process_details['status']:
+            return  { 'status': process_details['status'],
+             'message': process_details['error'] }
+    except:
+        return  { 'status': False,
+             'message': 'Error occured while retrying transaction please try again'}
+    
+    # If everything works return success message
+    return  { 'status': True,
              'message': 'Successfully retrying transaction' }
+
+
+
+
+
+    
