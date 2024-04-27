@@ -66,7 +66,8 @@
   "activity_logs_section",
   "activity_logs_table",
   "complete_details_section_section",
-  "complete_request_data"
+  "complete_request_data",
+  "complete_request_data_json"
  ],
  "fields": [
   {
@@ -317,6 +318,7 @@
   {
    "fieldname": "complete_request_data",
    "fieldtype": "Text",
+   "hidden": 1,
    "label": "Complete Request Data"
   },
   {
@@ -370,11 +372,17 @@
    "fieldname": "project_abbreviation",
    "fieldtype": "Data",
    "label": "Project Abbreviation"
+  },
+  {
+   "fieldname": "complete_request_data_json",
+   "fieldtype": "JSON",
+   "label": "Complete Request Data",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-09-28 00:42:33.396604",
+ "modified": "2024-04-27 18:51:04.207486",
  "modified_by": "Administrator",
  "module": "Sebco Customization",
  "name": "Boya Expense",
