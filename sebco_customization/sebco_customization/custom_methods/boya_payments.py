@@ -65,7 +65,7 @@ class BoyaPayments:
         new_expense_doc.channel = self.get_values(['channel'])
 
         # handle sub category as  table
-        # new_expense_doc.subcategory = self.expense_details['subcategory']
+        new_expense_doc.subcategory = self.expense_details['subcategory']
         new_expense_doc.subcategory_id = self.get_values(['subcategory','_id'])
         new_expense_doc.group_id = self.get_values(['subcategory','group_id'])
         new_expense_doc.category = self.get_values(['subcategory','category'])
@@ -469,16 +469,18 @@ class BoyaPayments:
         creation_status = self.create_actual_journal_entry(amount,default_company,debit_acc,boya_account,default_cost_center,'Bank Entry',self.defined_project)
 
     def get_values(self,keys):
-        # Initialize a variable to hold the current level of the dictionary
+        # define current_dict as expense details from Boya API
         current_dict = self.expense_details
 
         # Traverse through each key in the list
         for key in keys:
-            if key in current_dict:
-                current_dict = current_dict[key]
-            else:
-                return None  
+            try:
+                if key in current_dict:
+                    current_dict = current_dict[key]
+                else:
+                    return ''  
+            except:
+                return ''
                     
         return current_dict
-    
         
