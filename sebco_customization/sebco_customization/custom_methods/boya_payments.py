@@ -512,7 +512,7 @@ class BoyaPayments:
             new_journal_entry.company = company
 
             # Ensure that the posting transaction_date is defined
-            transaction_date = self.expense_details['transaction_date'].split('T')[0]
+            transaction_date = self.expense_doc.transaction_date.split('T')[0]
             if not transaction_date:
                 self.expense_doc.append('activity_logs_table',
                     {
