@@ -18,6 +18,7 @@
   "amount_and_fees_section_section",
   "amount",
   "fees",
+  "transaction_date",
   "column_break_tyb2v",
   "charge",
   "original_currency",
@@ -376,11 +377,16 @@
    "fieldname": "complete_request_data_json",
    "fieldtype": "JSON",
    "label": "Complete Request Data"
+  },
+  {
+   "fieldname": "transaction_date",
+   "fieldtype": "Data",
+   "label": "Transaction Date"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-04-27 23:17:11.323702",
+ "modified": "2024-04-29 00:54:12.156038",
  "modified_by": "Administrator",
  "module": "Sebco Customization",
  "name": "Boya Expense",
