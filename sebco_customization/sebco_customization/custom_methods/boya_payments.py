@@ -65,6 +65,7 @@ class BoyaPayments:
         new_expense_doc.provider_ref = self.get_values(['provider_ref'])
         new_expense_doc.amount = self.get_values(['amount'])
         new_expense_doc.fees = self.get_values(['fees'])
+        new_expense_doc.transaction_date = self.get_values(['transaction_date'])
         new_expense_doc.charge = self.get_values(['charge'])
         new_expense_doc.original_currency = self.get_values(['original_currency'])
         # new_expense_doc.original_amount = self.expense_details['original_amount']
@@ -177,6 +178,7 @@ class BoyaPayments:
         expense_doc.provider_ref = self.get_only_nil_values(expense_doc.provider_ref,['provider_ref'])
         expense_doc.amount = self.get_only_nil_values(expense_doc.amount,['amount'])
         expense_doc.fees = self.get_only_nil_values(expense_doc.amount,['fees'])
+        expense_doc.transaction_date = self.get_values(['transaction_date'])
         expense_doc.charge = self.get_only_nil_values(expense_doc.charge,['charge'])
         expense_doc.original_currency = self.get_only_nil_values(expense_doc.original_currency,['original_currency'])
         # new_expense_doc.original_amount = self.expense_details['original_amount']
