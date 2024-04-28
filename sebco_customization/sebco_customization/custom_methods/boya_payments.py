@@ -508,7 +508,22 @@ class BoyaPayments:
             new_journal_entry = frappe.new_doc('Journal Entry')
             new_journal_entry.voucher_type = entry_type
             new_journal_entry.company = company
+
+            # Ensure that the posting transaction_date is defined
             transaction_date = self.expense_details['transaction_date'].split('T')[0]
+            if not transaction_date:
+                self.expense_doc.append('activity_logs_table',
+                    {
+                        'activity': 'Creating journal entry',
+                        'status': 'Failed',
+                        'description': 'The transaction date is not defined'
+                    }
+                )
+                self.expense_doc.status = 'Faiuled'
+                self.expense_doc.save()
+                frappe.db.commit()
+                return
+            
             new_journal_entry.posting_date = transaction_date
             new_journal_entry.cheque_no = self.expense_details['provider_ref'],
             new_journal_entry.cheque_date = transaction_date
