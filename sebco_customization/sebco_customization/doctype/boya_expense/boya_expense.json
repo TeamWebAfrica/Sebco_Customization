@@ -382,8 +382,7 @@
    "fieldname": "transaction_ref",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Transaction Ref",
-   "unique": 1
+   "label": "Transaction Ref"
   },
   {
    "fieldname": "transaction_ref_unique",
@@ -394,7 +393,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-06-12 15:44:16.623257",
+ "modified": "2024-06-12 15:59:30.833826",
  "modified_by": "Administrator",
  "module": "Sebco Customization",
  "name": "Boya Expense",
