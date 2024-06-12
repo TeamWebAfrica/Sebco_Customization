@@ -12,8 +12,8 @@
   "status",
   "id",
   "column_break_3mf2i",
-  "transaction_ref_original",
   "transaction_ref",
+  "transaction_ref_unique",
   "provider_ref",
   "linked_journal_entry",
   "amount_and_fees_section_section",
@@ -379,13 +379,14 @@
    "label": "Transaction Date"
   },
   {
-   "fieldname": "transaction_ref_original",
+   "fieldname": "transaction_ref",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Transaction Ref Original"
+   "label": "Transaction Ref",
+   "unique": 1
   },
   {
-   "fieldname": "transaction_ref",
+   "fieldname": "transaction_ref_unique",
    "fieldtype": "Data",
    "label": "Transaction Ref",
    "unique": 1
@@ -393,7 +394,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-06-12 15:31:08.004268",
+ "modified": "2024-06-12 15:44:16.623257",
  "modified_by": "Administrator",
  "module": "Sebco Customization",
  "name": "Boya Expense",

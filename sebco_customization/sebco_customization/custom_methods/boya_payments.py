@@ -40,7 +40,7 @@ class BoyaPayments:
             return 
 
         boya_expense_list = frappe.get_list('Boya Expense', fields=['name'], filters={
-            'transaction_ref': self.expense_details['transaction_ref']
+            'transaction_ref_unique': self.expense_details['transaction_ref']
         })
 
         self.expense_doc = None
@@ -61,7 +61,7 @@ class BoyaPayments:
 
         # add all the details from Boya
         new_expense_doc.id = self.get_values(['_id'])
-        new_expense_doc.transaction_ref = self.get_values(['transaction_ref'])
+        new_expense_doc.transaction_ref_unique = self.get_values(['transaction_ref'])
         new_expense_doc.provider_ref = self.get_values(['provider_ref'])
         new_expense_doc.amount = self.get_values(['amount'])
         new_expense_doc.fees = self.get_values(['fees'])
@@ -174,7 +174,7 @@ class BoyaPayments:
         
         # add all the details from Boya
         expense_doc.id = self.get_only_nil_values(expense_doc.id,['_id'])
-        expense_doc.transaction_ref = self.get_only_nil_values(expense_doc.transaction_ref,['transaction_ref'])
+        expense_doc.transaction_ref_unique = self.get_only_nil_values(expense_doc.transaction_ref,['transaction_ref'])
         expense_doc.provider_ref = self.get_only_nil_values(expense_doc.provider_ref,['provider_ref'])
         expense_doc.amount = self.get_only_nil_values(expense_doc.amount,['amount'])
         expense_doc.fees = self.get_only_nil_values(expense_doc.amount,['fees'])
@@ -664,7 +664,7 @@ class BoyaPayments:
 
     def get_only_nil_values(self,current_value,keys):
         '''
-        Method that will retunr the current values of the field in the doc or get its values from request
+        Method that will return the current values of the field in the doc or get its values from request
         if its values if nil
         '''
         if current_value:
