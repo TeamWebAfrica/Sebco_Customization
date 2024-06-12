@@ -83,12 +83,14 @@
    "fieldname": "transaction_ref",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Transaction Ref"
+   "label": "Transaction Ref",
+   "unique": 1
   },
   {
    "fieldname": "provider_ref",
    "fieldtype": "Data",
-   "label": "Provider Ref"
+   "label": "Provider Ref",
+   "unique": 1
   },
   {
    "fieldname": "amount",
@@ -234,7 +236,8 @@
   {
    "fieldname": "id",
    "fieldtype": "Data",
-   "label": "ID"
+   "label": "ID",
+   "unique": 1
   },
   {
    "fieldname": "charge",
@@ -386,7 +389,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-04-29 00:54:12.156038",
+ "modified": "2024-06-12 14:51:05.211979",
  "modified_by": "Administrator",
  "module": "Sebco Customization",
  "name": "Boya Expense",
