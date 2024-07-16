@@ -1,5 +1,5 @@
 import frappe
-from sebco_customization.sebco_customization.custom_methods.boya_payments import BoyaPayments
+from boya_integration.boya_integration.custom_methods.boya_payments import BoyaPayments
 
 frappe.utils.logger.set_log_level("DEBUG")
 logger = frappe.logger("boya_webhook", allow_site=True, file_count=50)

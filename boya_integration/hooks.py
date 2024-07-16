@@ -1,9 +1,9 @@
 from . import __version__ as app_version
 
-app_name = "sebco_customization"
-app_title = "Sebco Customization"
+app_name = "boya_integration"
+app_title = "Boya Integration"
 app_publisher = "Kipngetich Ngeno"
-app_description = "Customization for Sebco Limited"
+app_description = "Boya Integration"
 app_email = "khalifngeno@gmail.com"
 app_license = "MIT"
 
@@ -11,15 +11,15 @@ app_license = "MIT"
 # ------------------
 
 # include js, css files in header of desk.html
-# app_include_css = "/assets/sebco_customization/css/sebco_customization.css"
-# app_include_js = "/assets/sebco_customization/js/sebco_customization.js"
+# app_include_css = "/assets/boya_integration/css/boya_integration.css"
+# app_include_js = "/assets/boya_integration/js/boya_integration.js"
 
 # include js, css files in header of web template
-# web_include_css = "/assets/sebco_customization/css/sebco_customization.css"
-# web_include_js = "/assets/sebco_customization/js/sebco_customization.js"
+# web_include_css = "/assets/boya_integration/css/boya_integration.css"
+# web_include_js = "/assets/boya_integration/js/boya_integration.js"
 
 # include custom scss in every website theme (without file extension ".scss")
-# website_theme_scss = "sebco_customization/public/scss/website"
+# website_theme_scss = "boya_integration/public/scss/website"
 
 # include js, css files in header of web form
 # webform_include_js = {"doctype": "public/js/doctype.js"}
@@ -58,27 +58,27 @@ doctype_js = {
 
 # add methods and filters to jinja environment
 # jinja = {
-#	"methods": "sebco_customization.utils.jinja_methods",
-#	"filters": "sebco_customization.utils.jinja_filters"
+#	"methods": "boya_integration.utils.jinja_methods",
+#	"filters": "boya_integration.utils.jinja_filters"
 # }
 
 # Installation
 # ------------
 
-# before_install = "sebco_customization.install.before_install"
-# after_install = "sebco_customization.install.after_install"
+# before_install = "boya_integration.install.before_install"
+# after_install = "boya_integration.install.after_install"
 
 # Uninstallation
 # ------------
 
-# before_uninstall = "sebco_customization.uninstall.before_uninstall"
-# after_uninstall = "sebco_customization.uninstall.after_uninstall"
+# before_uninstall = "boya_integration.uninstall.before_uninstall"
+# after_uninstall = "boya_integration.uninstall.after_uninstall"
 
 # Desk Notifications
 # ------------------
 # See frappe.core.notifications.get_notification_config
 
-# notification_config = "sebco_customization.notifications.get_notification_config"
+# notification_config = "boya_integration.notifications.get_notification_config"
 
 # Permissions
 # -----------
@@ -112,7 +112,7 @@ doc_events = {
 	# },
 	"Budget": {
         # will run before a Budget record is saved in the database
-        "before_save": "sebco_customization.sebco_customization.custom_methods.budget.before_save"
+        "before_save": "boya_integration.boya_integration.custom_methods.budget.before_save"
     }
 }
 
@@ -122,43 +122,43 @@ doc_events = {
 scheduler_events = {
     "cron": {
 		"0/1 * * * *": [
-			"sebco_customization.sebco_customization.tasks.test_function"
+			"boya_integration.boya_integration.tasks.test_function"
 		],
     },
 	# "all": [
-	# 	"sebco_customization.tasks.all"
+	# 	"boya_integration.tasks.all"
 	# ],
 	# "daily": [
-	# 	"sebco_customization.tasks.daily"
+	# 	"boya_integration.tasks.daily"
 	# ],
 	# "hourly": [
-	# 	"sebco_customization.tasks.hourly"
+	# 	"boya_integration.tasks.hourly"
 	# ],
 	# "weekly": [
-	# 	"sebco_customization.tasks.weekly"
+	# 	"boya_integration.tasks.weekly"
 	# ],
 	# "monthly": [
-	# 	"sebco_customization.tasks.monthly"
+	# 	"boya_integration.tasks.monthly"
 	# ],
 }
 
 # Testing
 # -------
 
-# before_tests = "sebco_customization.install.before_tests"
+# before_tests = "boya_integration.install.before_tests"
 
 # Overriding Methods
 # ------------------------------
 #
 # override_whitelisted_methods = {
-#	"frappe.desk.doctype.event.event.get_events": "sebco_customization.event.get_events"
+#	"frappe.desk.doctype.event.event.get_events": "boya_integration.event.get_events"
 # }
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
 # along with any modifications made in other Frappe apps
 # override_doctype_dashboards = {
-#	"Task": "sebco_customization.task.get_dashboard_data"
+#	"Task": "boya_integration.task.get_dashboard_data"
 # }
 
 # exempt linked doctypes from being automatically cancelled
@@ -194,7 +194,7 @@ scheduler_events = {
 # --------------------------------
 
 # auth_hooks = [
-#	"sebco_customization.auth.validate"
+#	"boya_integration.auth.validate"
 # ]
 
 fixtures = ["Custom Field"]

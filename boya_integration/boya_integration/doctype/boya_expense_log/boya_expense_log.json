@@ -1,29 +1,22 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2023-08-31 01:05:42.106144",
+ "creation": "2023-09-03 18:59:34.833399",
  "default_view": "List",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "person",
-  "reviewed_on",
-  "notes",
-  "status"
+  "activity",
+  "status",
+  "description"
  ],
  "fields": [
   {
-   "fieldname": "reviewed_on",
-   "fieldtype": "Date",
+   "fieldname": "activity",
+   "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Reviewed On"
-  },
-  {
-   "fieldname": "notes",
-   "fieldtype": "Text",
-   "in_list_view": 1,
-   "label": "Notes"
+   "label": "Activity"
   },
   {
    "fieldname": "status",
@@ -32,19 +25,19 @@
    "label": "Status"
   },
   {
-   "fieldname": "person",
-   "fieldtype": "Data",
+   "fieldname": "description",
+   "fieldtype": "Text",
    "in_list_view": 1,
-   "label": "Person"
+   "label": "Description"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-08-31 23:54:06.280440",
+ "modified": "2023-09-03 19:14:01.738383",
  "modified_by": "Administrator",
- "module": "Sebco Customization",
- "name": "Boya Expese Review",
+ "module": "Boya Integration",
+ "name": "Boya Expense Log",
  "owner": "Administrator",
  "permissions": [],
  "sort_field": "modified",

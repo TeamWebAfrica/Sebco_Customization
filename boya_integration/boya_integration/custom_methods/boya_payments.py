@@ -329,11 +329,11 @@ class BoyaPayments:
             return
         
         # Get Boya Settings details
-        sebco_settings = frappe.get_single('Sebco Settings')
-        boya_account = sebco_settings.boya_expense_account
-        default_cost_center = sebco_settings.default_cost_center
-        default_company = sebco_settings.default_company
-        related_party_accounts = sebco_settings.boya_expense_company_account
+        boya_settings = frappe.get_single('Boya Settings')
+        boya_account = boya_settings.boya_expense_account
+        default_cost_center = boya_settings.default_cost_center
+        default_company = boya_settings.default_company
+        related_party_accounts = boya_settings.boya_expense_company_account
 
         # company and cost center of project owner
         associated_company, associated_cost_center,project_name, self.defined_project = None, None, None, None 
@@ -391,11 +391,11 @@ class BoyaPayments:
             if not associated_company or not associated_cost_center:
                 # define project as part of self
                 self.defined_project = project_name
-                # create one journal entry within the main company in sebco settings
+                # create one journal entry within the main company in boya settings
                 self.create_journal_with_default_settings(default_company,boya_account,default_cost_center)
                 return
         else:
-            # create one journal entry within the main company in sebco settings
+            # create one journal entry within the main company in boya settings
             self.create_journal_with_default_settings(default_company,boya_account,default_cost_center)
             return
     
@@ -408,7 +408,7 @@ class BoyaPayments:
         else:
             # define project as part of self
             self.defined_project = project_name
-            # create one journal entry within the main company in sebco settings
+            # create one journal entry within the main company in boya settings
             self.create_journal_with_default_settings(default_company,boya_account,default_cost_center)
             return
         
@@ -471,7 +471,7 @@ class BoyaPayments:
         Method used to define the correct supplier expense account
         '''
         try:
-            # Sebco accounts from are given in the following format
+            # Boya accounts from are given in the following format
             # <Project Identifiers - varying number of letters><seven digits - actual account number>
             if self.expense_doc.code:
                 supplier_expense_acc_no = self.expense_doc.code

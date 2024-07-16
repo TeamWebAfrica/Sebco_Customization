@@ -3,13 +3,13 @@ from setuptools import setup, find_packages
 with open("requirements.txt") as f:
 	install_requires = f.read().strip().split("\n")
 
-# get version from __version__ variable in sebco_customization/__init__.py
-from sebco_customization import __version__ as version
+# get version from __version__ variable in boya_integration/__init__.py
+from boya_integration import __version__ as version
 
 setup(
-	name="sebco_customization",
+	name="boya_integration",
 	version=version,
-	description="Customization for Sebco Limited",
+	description="Boya Integration",
 	author="Kipngetich Ngeno",
 	author_email="khalifngeno@gmail.com",
 	packages=find_packages(),

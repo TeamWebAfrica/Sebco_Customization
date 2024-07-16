@@ -3,8 +3,8 @@ from frappe import _
 def get_data():
 	return [
 		{
-			"module_name": "Sebco Customization",
+			"module_name": "Boya Integration",
 			"type": "module",
-			"label": _("Sebco Customization")
+			"label": _("Boya Integration")
 		}
 	]
