@@ -1,7 +1,7 @@
 // Copyright (c) 2023, Kipngetich Ngeno and contributors
 // For license information, please see license.txt
 
-frappe.ui.form.on('Sebco Settings', {
+frappe.ui.form.on('Boya Settings', {
 	refresh: function(frm) {
 
 		// filter accounts to show non group accounts

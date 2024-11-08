@@ -7,7 +7,7 @@ frappe.ui.form.on('Boya Expense', {
 		// Add more action buttons
 		frm.add_custom_button(__('Retry Processing'), function(){
 			frappe.call({
-				method: "sebco_customization.sebco_customization.custom_methods.boya_payments.retry_processing",
+				method: "boya_integration.boya_integration.custom_methods.boya_payments.retry_processing",
 				args: 	{
 						doctype: "Boya Expense",
 						filters: {

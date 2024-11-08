@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestSebcoSettings(FrappeTestCase):
+class TestBoyaSettings(FrappeTestCase):
 	pass

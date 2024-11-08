@@ -1,6 +1,6 @@
-## Sebco Customization
+## Boya Integration
 
-Customization for Sebco Limited
+Customization for Boya Integration Limited
 
 #### License
 

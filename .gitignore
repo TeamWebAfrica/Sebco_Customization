@@ -2,6 +2,7 @@
 *.pyc
 *.egg-info
 *.swp
+*.vscode/
 tags
-sebco_customization/docs/current
+boya_integration/docs/current
 node_modules/

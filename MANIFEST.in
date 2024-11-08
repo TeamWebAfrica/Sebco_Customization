@@ -4,15 +4,15 @@ include *.json
 include *.md
 include *.py
 include *.txt
-recursive-include sebco_customization *.css
-recursive-include sebco_customization *.csv
-recursive-include sebco_customization *.html
-recursive-include sebco_customization *.ico
-recursive-include sebco_customization *.js
-recursive-include sebco_customization *.json
-recursive-include sebco_customization *.md
-recursive-include sebco_customization *.png
-recursive-include sebco_customization *.py
-recursive-include sebco_customization *.svg
-recursive-include sebco_customization *.txt
-recursive-exclude sebco_customization *.pyc
+recursive-include boya_integration *.css
+recursive-include boya_integration *.csv
+recursive-include boya_integration *.html
+recursive-include boya_integration *.ico
+recursive-include boya_integration *.js
+recursive-include boya_integration *.json
+recursive-include boya_integration *.md
+recursive-include boya_integration *.png
+recursive-include boya_integration *.py
+recursive-include boya_integration *.svg
+recursive-include boya_integration *.txt
+recursive-exclude boya_integration *.pyc
